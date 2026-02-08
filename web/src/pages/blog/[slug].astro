@@ -87,16 +87,36 @@ const minRead = readingTime(post.body)
 
   <section class="subscribe">
     <p>Enjoyed this post? Get new ones in your inbox.</p>
-    <form
-      action="https://app.kit.com/forms/9065996/subscriptions"
-      method="post"
-      class="subscribe-form"
-    >
+    <form class="subscribe-form" data-kit-form>
       <input type="email" name="email_address" placeholder="your@email.com" required />
       <button type="submit">Subscribe</button>
     </form>
+    <p class="subscribe-success" style="display:none;">Thanks! Check your email to confirm.</p>
     <p class="rss-link">Or subscribe via <a href="/rss.xml">RSS</a></p>
   </section>
+  <script is:inline>
+    document.querySelectorAll('[data-kit-form]').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = form.querySelector('input[name="email_address"]').value;
+        var btn = form.querySelector('button');
+        btn.textContent = 'Subscribing...';
+        btn.disabled = true;
+        fetch('https://app.kit.com/forms/9065996/subscriptions', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: 'email_address=' + encodeURIComponent(email),
+          mode: 'no-cors'
+        }).then(function() {
+          form.style.display = 'none';
+          form.nextElementSibling.style.display = 'block';
+        }).catch(function() {
+          btn.textContent = 'Subscribe';
+          btn.disabled = false;
+        });
+      });
+    });
+  </script>
 
   <section class="comments">
     <script
