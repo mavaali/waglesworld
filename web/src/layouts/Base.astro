@@ -28,6 +28,10 @@ const {title, description = 'waglesworld - a personal blog'} = Astro.props
     </main>
     <footer>
       <p>&copy; {new Date().getFullYear()} waglesworld</p>
+      <div class="socials">
+        <a href="https://www.linkedin.com/mihirwagle" target="_blank" rel="noopener noreferrer">linkedin</a>
+        <a href="https://bsky.app/profile/waglesworld.com" target="_blank" rel="noopener noreferrer">bluesky</a>
+      </div>
     </footer>
     <style is:global>
       * {
@@ -79,6 +83,16 @@ const {title, description = 'waglesworld - a personal blog'} = Astro.props
         border-top: 1px solid #eee;
         color: #666;
         font-size: 0.875rem;
+      }
+
+      .socials {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .socials a {
+        color: #666;
       }
 
       h1 {
