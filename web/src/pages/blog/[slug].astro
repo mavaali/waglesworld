@@ -102,13 +102,12 @@ const minRead = readingTime(post.body)
         var btn = form.querySelector('button');
         btn.textContent = 'Subscribing...';
         btn.disabled = true;
-        fetch('https://app.kit.com/forms/9065996/subscriptions', {
+        fetch('https://api.convertkit.com/v3/forms/9065996/subscribe', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-            'Accept': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8'
           },
-          body: JSON.stringify({email_address: email})
+          body: JSON.stringify({api_key: '2oEXnmtRQKcj-qQEXCNx-g', email: email})
         }).then(function(res) {
           if (res.ok || res.status === 200 || res.status === 201) {
             form.style.display = 'none';
