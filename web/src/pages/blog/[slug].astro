@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
 import {PortableText} from 'astro-portabletext'
-import {postQuery, postsQuery, urlFor} from '../../utils/sanity'
+import {postQuery, postsQuery, urlFor, readingTime} from '../../utils/sanity'
 
 export async function getStaticPaths() {
   const posts = await sanityClient.fetch(postsQuery)
@@ -21,6 +21,7 @@ if (!post) {
 
 const isMarkdown = typeof post.body === 'string'
 const htmlBody = isMarkdown ? marked(post.body) : null
+const minRead = readingTime(post.body)
 ---
 
 <Base title={`${post.title} - waglesworld`}>
@@ -53,7 +54,7 @@ const htmlBody = isMarkdown ? marked(post.body) : null
             </time>
           )
         }
-        {post.estimatedReadingTime && <span>{post.estimatedReadingTime} min read</span>}
+        <span>{minRead} min read</span>
       </div>
       {
         post.tags && post.tags.length > 0 && (

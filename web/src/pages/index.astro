@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
-import {postsQuery, urlFor} from '../utils/sanity'
+import {postsQuery, urlFor, readingTime} from '../utils/sanity'
 
 const posts = await sanityClient.fetch(postsQuery)
 const recentPosts = posts.slice(0, 5)
@@ -27,7 +27,7 @@ const recentPosts = posts.slice(0, 5)
                       month: 'short',
                       day: 'numeric',
                     })}
-                  {post.estimatedReadingTime && ` \u00b7 ${post.estimatedReadingTime} min read`}
+                  {post.body && ` \u00b7 ${readingTime(post.body)} min read`}
                 </span>
               </a>
             </li>

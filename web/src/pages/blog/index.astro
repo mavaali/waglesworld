@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
-import {postsQuery} from '../../utils/sanity'
+import {postsQuery, readingTime} from '../../utils/sanity'
 
 const posts = await sanityClient.fetch(postsQuery)
 ---
@@ -24,7 +24,7 @@ const posts = await sanityClient.fetch(postsQuery)
                     month: 'short',
                     day: 'numeric',
                   })}
-                {post.estimatedReadingTime && ` \u00b7 ${post.estimatedReadingTime} min read`}
+                {post.body && ` \u00b7 ${readingTime(post.body)} min read`}
                 {post.tags && post.tags.length > 0 && (
                   <span class="tags">
                     {post.tags.map((tag: string) => (
