@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
+import {marked} from 'marked'
 import {PortableText} from 'astro-portabletext'
 import {postQuery, postsQuery, urlFor} from '../../utils/sanity'
 
@@ -17,6 +18,9 @@ const post = await sanityClient.fetch(postQuery, {slug})
 if (!post) {
   return Astro.redirect('/404')
 }
+
+const isMarkdown = typeof post.body === 'string'
+const htmlBody = isMarkdown ? marked(post.body) : null
 ---
 
 <Base title={`${post.title} - waglesworld`}>
@@ -73,7 +77,8 @@ if (!post) {
     }
 
     <div class="body">
-      {post.body && <PortableText value={post.body} />}
+      {post.body && isMarkdown && <Fragment set:html={htmlBody} />}
+      {post.body && !isMarkdown && <PortableText value={post.body} />}
     </div>
   </article>
 
