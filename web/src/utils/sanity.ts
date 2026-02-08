@@ -19,7 +19,16 @@ export function excerpt(body: unknown, maxLength = 155): string {
       .map((block: any) => block.children?.map((c: any) => c.text).join('') ?? '')
       .join(' ')
   }
-  text = text.replace(/[#*_\[\]()>`~\-]/g, '').replace(/\s+/g, ' ').trim()
+  // Strip markdown formatting
+  text = text.replace(/[#*_\[\]()>`~]/g, '').replace(/\s+/g, ' ').trim()
+  // Skip cross-post preamble and heading lines
+  const lines = text.split(/\.\s+|!\s+/)
+  const contentStart = lines.findIndex(
+    (l) => !/originally published on LinkedIn/i.test(l) && !/Read it there/i.test(l) && l.trim().length > 30
+  )
+  if (contentStart > 0) {
+    text = lines.slice(contentStart).join('. ').trim()
+  }
   if (text.length <= maxLength) return text
   return text.slice(0, maxLength).replace(/\s\S*$/, '') + '...'
 }
