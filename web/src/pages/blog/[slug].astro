@@ -87,42 +87,9 @@ const minRead = readingTime(post.body)
 
   <section class="subscribe">
     <p>Enjoyed this post? Get new ones in your inbox.</p>
-    <form class="subscribe-form" data-kit-form>
-      <input type="email" name="email_address" placeholder="your@email.com" required />
-      <button type="submit">Subscribe</button>
-    </form>
-    <p class="subscribe-success" style="display:none;">Thanks! Check your email to confirm.</p>
+    <script async data-uid="a1f891a000" src="https://waglesworld.kit.com/a1f891a000/index.js"></script>
     <p class="rss-link">Or subscribe via <a href="/rss.xml">RSS</a></p>
   </section>
-  <script is:inline>
-    document.querySelectorAll('[data-kit-form]').forEach(function(form) {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var email = form.querySelector('input[name="email_address"]').value;
-        var btn = form.querySelector('button');
-        btn.textContent = 'Subscribing...';
-        btn.disabled = true;
-        fetch('https://api.convertkit.com/v3/forms/9065996/subscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          },
-          body: JSON.stringify({api_key: '2oEXnmtRQKcj-qQEXCNx-g', email: email})
-        }).then(function(res) {
-          if (res.ok || res.status === 200 || res.status === 201) {
-            form.style.display = 'none';
-            form.nextElementSibling.style.display = 'block';
-          } else {
-            throw new Error('Subscription failed');
-          }
-        }).catch(function() {
-          btn.textContent = 'Subscribe';
-          btn.disabled = false;
-          window.open('https://waglesworld.kit.com/a1f891a000', '_blank');
-        });
-      });
-    });
-  </script>
 
   <section class="comments">
     <script
@@ -247,35 +214,6 @@ const minRead = readingTime(post.body)
   .subscribe p {
     color: #666;
     margin-bottom: 1rem;
-  }
-
-  .subscribe-form {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .subscribe-form input {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: inherit;
-  }
-
-  .subscribe-form button {
-    padding: 0.5rem 1.25rem;
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .subscribe-form button:hover {
-    background: #333;
   }
 
   .rss-link {
