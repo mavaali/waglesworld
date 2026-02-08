@@ -1,0 +1,175 @@
+---
+import Base from '../../layouts/Base.astro'
+import {sanityClient} from 'sanity:client'
+import {PortableText} from 'astro-portabletext'
+import {postQuery, postsQuery, urlFor} from '../../utils/sanity'
+
+export async function getStaticPaths() {
+  const posts = await sanityClient.fetch(postsQuery)
+  return posts.map((post: any) => ({
+    params: {slug: post.slug.current},
+  }))
+}
+
+const {slug} = Astro.params
+const post = await sanityClient.fetch(postQuery, {slug})
+
+if (!post) {
+  return Astro.redirect('/404')
+}
+---
+
+<Base title={`${post.title} - waglesworld`}>
+  <article>
+    <header>
+      <h1>{post.title}</h1>
+      <div class="meta">
+        {
+          post.author && (
+            <span class="author">
+              {post.author.image && (
+                <img
+                  src={urlFor(post.author.image).width(32).height(32).url()}
+                  alt={post.author.name}
+                  class="author-img"
+                />
+              )}
+              {post.author.name}
+            </span>
+          )
+        }
+        {
+          post.publishedAt && (
+            <time datetime={post.publishedAt}>
+              {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </time>
+          )
+        }
+        {post.estimatedReadingTime && <span>{post.estimatedReadingTime} min read</span>}
+      </div>
+      {
+        post.tags && post.tags.length > 0 && (
+          <div class="tags">
+            {post.tags.map((tag: string) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    {
+      post.mainImage && (
+        <img
+          src={urlFor(post.mainImage).width(720).url()}
+          alt={post.title}
+          class="hero-image"
+        />
+      )
+    }
+
+    <div class="body">
+      {post.body && <PortableText value={post.body} />}
+    </div>
+  </article>
+
+  <a href="/blog" class="back">&larr; Back to blog</a>
+</Base>
+
+<style>
+  article header {
+    margin-bottom: 2rem;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #666;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  .author {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .author-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .tag {
+    background: #f0f0f0;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    color: #555;
+  }
+
+  .hero-image {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .body {
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .body :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .body :global(h2) {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .body :global(h3) {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .body :global(blockquote) {
+    border-left: 3px solid #ddd;
+    padding-left: 1rem;
+    color: #555;
+    margin: 1.5rem 0;
+  }
+
+  .body :global(ul),
+  .body :global(ol) {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem;
+  }
+
+  .body :global(img) {
+    margin: 1.5rem 0;
+  }
+
+  .body :global(a) {
+    color: #0066cc;
+    text-decoration: underline;
+  }
+
+  .back {
+    display: inline-block;
+    margin-top: 3rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+</style>
