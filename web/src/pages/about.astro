@@ -1,8 +1,30 @@
 ---
 import Base from '../layouts/Base.astro'
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Mihir Wagle',
+  url: 'https://waglesworld.com/about',
+  jobTitle: 'Technologist',
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Microsoft',
+  },
+  alumniOf: {
+    '@type': 'CollegeOrUniversity',
+    name: 'IIT Bombay',
+  },
+  sameAs: [
+    'https://www.linkedin.com/in/mihirwagle/',
+    'https://github.com/mavaali',
+    'https://bsky.app/profile/waglesworld.com',
+  ],
+})
 ---
 
-<Base title="About - waglesworld" description="About Mihir Wagle">
+<Base title="About - waglesworld" description="About Mihir Wagle - technologist at Microsoft, IIT Bombay alum, writing about agentic AI, data platforms, and cricket.">
+  <script type="application/ld+json" set:html={jsonLd} />
   <h1>About</h1>
   <div class="bio">
     <p>By day, I am a technologist at Microsoft; by weekend, I am a builder, hiker, and enthusiast of detailed universes.</p>

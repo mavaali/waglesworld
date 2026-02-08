@@ -71,6 +71,12 @@ vercel --prod --yes
 npx sanity@latest dataset export production
 ```
 
+## AI Context Rules
+
+- Always use GROQ for content queries.
+- When drafting new posts, ensure the `publishedAt` date reflects the original publication date if backfilling.
+- Prioritize technical depth in data supply chain comparisons.
+
 ## Domain
 
 - waglesworld.com hosted on GoDaddy

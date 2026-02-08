@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
 import {PortableText} from 'astro-portabletext'
+import groq from 'groq'
 import {postQuery, postsQuery, urlFor, readingTime, excerpt} from '../../utils/sanity'
 
 export async function getStaticPaths() {
@@ -24,7 +25,19 @@ const htmlBody = isMarkdown ? marked(post.body) : null
 const minRead = readingTime(post.body)
 const postDescription = excerpt(post.body)
 const postImage = post.mainImage ? urlFor(post.mainImage).width(1200).url() : undefined
-const postUrl = `https://waglesworld.com/blog/${post.slug.current}/`
+const postUrl = new URL(`/blog/${post.slug.current}/`, Astro.site).href
+
+const relatedPosts = post.tags?.length
+  ? await sanityClient.fetch(
+      groq`*[_type == "post" && slug.current != $slug && count(tags[@ in $tags]) > 0] | order(publishedAt desc) [0...3] {
+        title,
+        slug,
+        publishedAt,
+        tags
+      }`,
+      {slug, tags: post.tags}
+    )
+  : []
 
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -35,6 +48,10 @@ const jsonLd = JSON.stringify({
     '@type': 'Person',
     name: post.author?.name || 'Mihir Wagle',
     url: 'https://waglesworld.com/about',
+    sameAs: [
+      'https://www.linkedin.com/in/mihirwagle/',
+      'https://github.com/mavaali',
+    ],
   },
   datePublished: post.publishedAt,
   url: postUrl,
@@ -121,6 +138,28 @@ const jsonLd = JSON.stringify({
     </form>
     <p class="rss-link">Or subscribe via <a href="/rss.xml">RSS</a></p>
   </section>
+
+  {relatedPosts.length > 0 && (
+    <section class="related">
+      <h2>Related Posts</h2>
+      <ul>
+        {relatedPosts.map((rp: any) => (
+          <li>
+            <a href={`/blog/${rp.slug.current}/`}>{rp.title}</a>
+            {rp.publishedAt && (
+              <time datetime={rp.publishedAt}>
+                {new Date(rp.publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </time>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
 
   <section class="comments">
     <script
@@ -284,6 +323,41 @@ const jsonLd = JSON.stringify({
   .rss-link a {
     color: #0066cc;
     text-decoration: underline;
+  }
+
+  .related {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+  }
+
+  .related h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .related ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .related li {
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .related a {
+    color: #0066cc;
+    text-decoration: underline;
+  }
+
+  .related time {
+    color: #999;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   .comments {

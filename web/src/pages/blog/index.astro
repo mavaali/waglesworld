@@ -6,7 +6,7 @@ import {postsQuery, readingTime} from '../../utils/sanity'
 const posts = await sanityClient.fetch(postsQuery)
 ---
 
-<Base title="Blog - waglesworld">
+<Base title="Blog - waglesworld" description="Articles on agentic AI, data platforms, supply chain intelligence, and more by Mihir Wagle.">
   <h1>Blog</h1>
   {
     posts.length === 0 ? (
