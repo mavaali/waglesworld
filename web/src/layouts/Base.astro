@@ -2,9 +2,11 @@
 interface Props {
   title: string
   description?: string
+  image?: string
+  type?: string
 }
 
-const {title, description = 'waglesworld - a personal blog'} = Astro.props
+const {title, description = 'waglesworld - a personal blog', image, type = 'website'} = Astro.props
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
 
@@ -17,6 +19,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title="waglesworld" href="/rss.xml" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="waglesworld" />
+    {image && <meta property="og:image" content={image} />}
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
     <title>{title}</title>
   </head>
   <body>

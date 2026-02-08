@@ -9,6 +9,21 @@ export function urlFor(source: SanityImageSource) {
   return builder.image(source)
 }
 
+export function excerpt(body: unknown, maxLength = 155): string {
+  let text = ''
+  if (typeof body === 'string') {
+    text = body
+  } else if (Array.isArray(body)) {
+    text = body
+      .filter((block: any) => block._type === 'block')
+      .map((block: any) => block.children?.map((c: any) => c.text).join('') ?? '')
+      .join(' ')
+  }
+  text = text.replace(/[#*_\[\]()>`~\-]/g, '').replace(/\s+/g, ' ').trim()
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength).replace(/\s\S*$/, '') + '...'
+}
+
 export function readingTime(body: unknown): number {
   let text = ''
   if (typeof body === 'string') {

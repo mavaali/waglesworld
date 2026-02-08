@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
 import {PortableText} from 'astro-portabletext'
-import {postQuery, postsQuery, urlFor, readingTime} from '../../utils/sanity'
+import {postQuery, postsQuery, urlFor, readingTime, excerpt} from '../../utils/sanity'
 
 export async function getStaticPaths() {
   const posts = await sanityClient.fetch(postsQuery)
@@ -22,9 +22,37 @@ if (!post) {
 const isMarkdown = typeof post.body === 'string'
 const htmlBody = isMarkdown ? marked(post.body) : null
 const minRead = readingTime(post.body)
+const postDescription = excerpt(post.body)
+const postImage = post.mainImage ? urlFor(post.mainImage).width(1200).url() : undefined
+const postUrl = `https://waglesworld.com/blog/${post.slug.current}/`
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.title,
+  description: postDescription,
+  author: {
+    '@type': 'Person',
+    name: post.author?.name || 'Mihir Wagle',
+    url: 'https://waglesworld.com/about',
+  },
+  datePublished: post.publishedAt,
+  url: postUrl,
+  publisher: {
+    '@type': 'Person',
+    name: 'Mihir Wagle',
+    url: 'https://waglesworld.com',
+  },
+  ...(postImage && {image: postImage}),
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': postUrl,
+  },
+})
 ---
 
-<Base title={`${post.title} - waglesworld`}>
+<Base title={`${post.title} - waglesworld`} description={postDescription} image={postImage} type="article">
+  <script type="application/ld+json" set:html={jsonLd} />
   <article>
     <header>
       <h1>{post.title}</h1>
