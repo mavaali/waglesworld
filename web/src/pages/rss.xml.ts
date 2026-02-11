@@ -2,7 +2,10 @@ import rss from '@astrojs/rss'
 import type {APIContext} from 'astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
+import markedKatex from 'marked-katex-extension'
 import {postsQuery, excerpt} from '../utils/sanity'
+
+marked.use(markedKatex({throwOnError: false}))
 
 export async function GET(context: APIContext) {
   const posts = await sanityClient.fetch(postsQuery)

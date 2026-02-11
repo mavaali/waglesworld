@@ -16,6 +16,8 @@
     "@sanity/image-url": "^2.0.3",
     "astro": "^5.17.1",
     "astro-portabletext": "^0.13.0",
-    "marked": "^17.0.1"
+    "katex": "^0.16.28",
+    "marked": "^17.0.1",
+    "marked-katex-extension": "^5.1.6"
   }
 }
