@@ -1,0 +1,144 @@
+---
+import Base from '../../layouts/Base.astro'
+import {sanityClient} from 'sanity:client'
+import {bookReviewsQuery, bookCoverUrl, readingTime} from '../../utils/sanity'
+
+const reviews = await sanityClient.fetch(bookReviewsQuery)
+---
+
+<Base title="Books - waglesworld" description="Book reviews and recommendations by Mihir Wagle.">
+  <h1>Books</h1>
+  {
+    reviews.length === 0 ? (
+      <p class="empty">No reviews yet. Check back soon.</p>
+    ) : (
+      <ul class="reviews">
+        {reviews.map((review: any) => {
+          const cover = bookCoverUrl(review)
+          return (
+            <li>
+              <a href={`/books/${review.slug.current}`}>
+                {cover && <img src={cover} alt={review.title} class="cover" loading="lazy" />}
+                <div class="info">
+                  <span class="book-title">{review.title}</span>
+                  <span class="book-author">by {review.bookAuthor}</span>
+                  <div class="post-meta">
+                    <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+                    {review.publishedAt &&
+                      new Date(review.publishedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    {review.body && ` · ${readingTime(review.body)} min read`}
+                  </div>
+                  {review.tags && review.tags.length > 0 && (
+                    <div class="tags">
+                      {review.tags.map((tag: string) => (
+                        <span class="tag">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    )
+  }
+</Base>
+
+<style>
+  .empty {
+    color: #666;
+    margin-top: 1rem;
+  }
+
+  .reviews {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .reviews a {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: flex-start;
+  }
+
+  .cover {
+    width: 60px;
+    height: auto;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .book-title {
+    font-weight: 500;
+    font-size: 1.1rem;
+  }
+
+  .book-author {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .post-meta {
+    color: #666;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  .rating {
+    background: #f0f0f0;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+  }
+
+  .rating-obsessed {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .rating-really-liked-it {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .rating-it-was-fine {
+    background: #f0f0f0;
+    color: #555;
+  }
+
+  .rating-dnf {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    background: #f0f0f0;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+  }
+</style>
