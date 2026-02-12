@@ -69,3 +69,40 @@ export const postQuery = groq`*[_type == "post" && slug.current == $slug][0] {
   author->{name, slug, image, bio},
   categories[]->{title}
 }`
+
+export const bookReviewsQuery = groq`*[_type == "bookReview" && defined(slug.current)] | order(publishedAt desc) {
+  _id,
+  title,
+  slug,
+  bookAuthor,
+  isbn,
+  coverImage,
+  rating,
+  tags,
+  publishedAt,
+  body
+}`
+
+export const bookReviewQuery = groq`*[_type == "bookReview" && slug.current == $slug][0] {
+  _id,
+  title,
+  slug,
+  bookAuthor,
+  isbn,
+  coverImage,
+  rating,
+  tags,
+  publishedAt,
+  body,
+  links
+}`
+
+export function bookCoverUrl(review: {isbn?: string; coverImage?: SanityImageSource}): string | null {
+  if (review.coverImage) {
+    return urlFor(review.coverImage).width(300).url()
+  }
+  if (review.isbn) {
+    return `https://covers.openlibrary.org/b/isbn/${review.isbn}-L.jpg`
+  }
+  return null
+}
