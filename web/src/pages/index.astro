@@ -1,10 +1,12 @@
 ---
 import Base from '../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
-import {postsQuery, urlFor, readingTime} from '../utils/sanity'
+import {postsQuery, bookReviewsQuery, urlFor, readingTime} from '../utils/sanity'
 
 const posts = await sanityClient.fetch(postsQuery)
 const recentPosts = posts.slice(0, 5)
+const allReviews = await sanityClient.fetch(bookReviewsQuery)
+const recentReviews = allReviews.slice(0, 5)
 ---
 
 <Base title="waglesworld">
@@ -34,6 +36,28 @@ const recentPosts = posts.slice(0, 5)
           ))}
         </ul>
         <a href="/blog" class="see-all">See all posts &rarr;</a>
+      </section>
+    )
+  }
+
+  {
+    recentReviews.length > 0 && (
+      <section class="recent-reads">
+        <h2>Recent reads</h2>
+        <ul>
+          {recentReviews.map((review: any) => (
+            <li>
+              <a href={`/books/${review.slug.current}`}>
+                <span class="post-title">{review.title}</span>
+                <span class="post-meta">
+                  <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+                  {review.bookAuthor}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="/books" class="see-all">See all books &rarr;</a>
       </section>
     )
   }
@@ -138,4 +162,39 @@ const recentPosts = posts.slice(0, 5)
     color: #0066cc;
     text-decoration: underline;
   }
+
+  .recent-reads ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .recent-reads a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .recent-reads .see-all {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+
+  .rating {
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    margin-right: 0.25rem;
+  }
+
+  .rating-obsessed { background: #fef3c7; color: #92400e; }
+  .rating-really-liked-it { background: #d1fae5; color: #065f46; }
+  .rating-it-was-fine { background: #f0f0f0; color: #555; }
+  .rating-dnf { background: #fee2e2; color: #991b1b; }
 </style>
