@@ -76,6 +76,26 @@ const description = review.body ? excerpt(review.body) : `${review.rating} — a
   </article>
 
   <a href="/books" class="back">&larr; Back to books</a>
+
+  <section class="comments">
+    <script
+      src="https://giscus.app/client.js"
+      data-repo="mavaali/waglesworld"
+      data-repo-id="R_kgDORLJ8TQ"
+      data-category="General"
+      data-category-id="DIC_kwDORLJ8Tc4C2CHX"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="light"
+      data-lang="en"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async
+    ></script>
+  </section>
 </Base>
 
 <style>
@@ -212,6 +232,12 @@ const description = review.body ? excerpt(review.body) : `${review.rating} — a
     margin-top: 3rem;
     color: #666;
     font-size: 0.875rem;
+  }
+
+  .comments {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
   }
 
   @media (max-width: 480px) {
