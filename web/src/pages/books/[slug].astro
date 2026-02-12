@@ -1,0 +1,236 @@
+---
+import Base from '../../layouts/Base.astro'
+import {sanityClient} from 'sanity:client'
+import {marked} from 'marked'
+import {bookReviewQuery, bookReviewsQuery, bookCoverUrl, readingTime, excerpt} from '../../utils/sanity'
+
+export async function getStaticPaths() {
+  const reviews = await sanityClient.fetch(bookReviewsQuery)
+  return reviews.map((review: any) => ({
+    params: {slug: review.slug.current},
+  }))
+}
+
+const {slug} = Astro.params
+const review = await sanityClient.fetch(bookReviewQuery, {slug})
+
+if (!review) {
+  return Astro.redirect('/404')
+}
+
+const isMarkdown = typeof review.body === 'string'
+const htmlBody = isMarkdown ? marked(review.body) : null
+const minRead = review.body ? readingTime(review.body) : null
+const cover = bookCoverUrl(review)
+const description = review.body ? excerpt(review.body) : `${review.rating} — a book review by Mihir Wagle`
+---
+
+<Base title={`${review.title} - waglesworld`} description={description} image={cover || undefined} type="article">
+  <article>
+    <header>
+      <div class="book-header">
+        {cover && <img src={cover} alt={review.title} class="cover" />}
+        <div class="book-info">
+          <h1>{review.title}</h1>
+          <p class="book-author">by {review.bookAuthor}</p>
+          <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+          <div class="meta">
+            {review.publishedAt && (
+              <time datetime={review.publishedAt}>
+                {new Date(review.publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+            )}
+            {minRead && <span>{minRead} min read</span>}
+          </div>
+          {review.tags && review.tags.length > 0 && (
+            <div class="tags">
+              {review.tags.map((tag: string) => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+
+    {review.body && isMarkdown && (
+      <div class="body">
+        <Fragment set:html={htmlBody} />
+      </div>
+    )}
+
+    {review.links && (review.links.amazon || review.links.bookshop || review.links.libby) && (
+      <div class="buy-links">
+        <h3>Get this book</h3>
+        <div class="link-list">
+          {review.links.amazon && <a href={review.links.amazon} target="_blank" rel="noopener noreferrer">Amazon</a>}
+          {review.links.bookshop && <a href={review.links.bookshop} target="_blank" rel="noopener noreferrer">Bookshop.org</a>}
+          {review.links.libby && <a href={review.links.libby} target="_blank" rel="noopener noreferrer">Libby</a>}
+        </div>
+      </div>
+    )}
+  </article>
+
+  <a href="/books" class="back">&larr; Back to books</a>
+</Base>
+
+<style>
+  .book-header {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  .cover {
+    width: 150px;
+    height: auto;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .book-author {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .rating {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    width: fit-content;
+  }
+
+  .rating-obsessed {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .rating-really-liked-it {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .rating-it-was-fine {
+    background: #f0f0f0;
+    color: #555;
+  }
+
+  .rating-dnf {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    background: #f0f0f0;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    color: #555;
+  }
+
+  .body {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin-top: 2rem;
+  }
+
+  .body :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .body :global(h2) {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .body :global(blockquote) {
+    border-left: 3px solid #ddd;
+    padding-left: 1rem;
+    color: #555;
+    margin: 1.5rem 0;
+  }
+
+  .body :global(a) {
+    color: #0066cc;
+    text-decoration: underline;
+  }
+
+  .buy-links {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+
+  .buy-links h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .link-list {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .link-list a {
+    color: #0066cc;
+    text-decoration: underline;
+    font-size: 0.95rem;
+  }
+
+  .back {
+    display: inline-block;
+    margin-top: 3rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 480px) {
+    .book-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .cover {
+      width: 120px;
+    }
+
+    .book-info {
+      align-items: center;
+    }
+
+    .tags {
+      justify-content: center;
+    }
+  }
+</style>
