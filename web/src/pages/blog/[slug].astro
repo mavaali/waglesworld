@@ -139,6 +139,7 @@ const jsonLd = JSON.stringify({
       <input type="email" name="email_address" placeholder="your@email.com" required />
       <button type="submit">Subscribe</button>
     </form>
+    <p class="consent-note">By subscribing, you agree to our <a href="/privacy">privacy policy</a>. Unsubscribe anytime.</p>
     <p class="rss-link">Or subscribe via <a href="/rss.xml">RSS</a></p>
   </section>
 
@@ -316,6 +317,18 @@ const jsonLd = JSON.stringify({
 
   .subscribe-form button:hover {
     background: #333;
+  }
+
+  .consent-note {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .consent-note a {
+    color: #999;
+    text-decoration: underline;
   }
 
   .rss-link {
