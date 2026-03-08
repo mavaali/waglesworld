@@ -26,7 +26,11 @@ const reading = await sanityClient.fetch(currentlyReadingQuery)
               <div class="book-card">
                 {cover && <img src={cover} alt={book.title} class="cover" loading="lazy" />}
                 <div class="info">
-                  <span class="book-title">{book.title}</span>
+                  {book.links?.amazon ? (
+                    <a href={book.links.amazon} target="_blank" rel="noopener noreferrer" class="book-title">{book.title}</a>
+                  ) : (
+                    <span class="book-title">{book.title}</span>
+                  )}
                   <span class="book-author">by {book.bookAuthor}</span>
                   {book.startedAt && (
                     <span class="started">

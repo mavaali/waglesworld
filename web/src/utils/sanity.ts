@@ -95,7 +95,8 @@ export const currentlyReadingQuery = groq`*[_type == "bookReview" && defined(slu
   startedAt,
   currentPage,
   totalPages,
-  body
+  body,
+  links
 }`
 
 export const allBookReviewsQuery = groq`*[_type == "bookReview" && defined(slug.current)] | order(coalesce(publishedAt, startedAt) desc) {
