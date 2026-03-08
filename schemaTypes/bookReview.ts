@@ -43,10 +43,23 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'status',
+      title: 'Status',
+      type: 'string',
+      initialValue: 'completed',
+      options: {
+        list: [
+          {title: 'Currently Reading', value: 'reading'},
+          {title: 'Completed', value: 'completed'},
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
       name: 'rating',
       title: 'Rating',
       type: 'string',
-      validation: (rule) => rule.required(),
+      hidden: ({document}) => document?.status === 'reading',
       options: {
         list: [
           {title: 'Obsessed', value: 'Obsessed'},
@@ -66,9 +79,29 @@ export default defineType({
       validation: (rule) => rule.unique(),
     }),
     defineField({
+      name: 'startedAt',
+      title: 'Started reading',
+      type: 'datetime',
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
+      description: 'Date the review was published (set when completed)',
+    }),
+    defineField({
+      name: 'currentPage',
+      title: 'Current Page',
+      type: 'number',
+      hidden: ({document}) => document?.status !== 'reading',
+      validation: (rule) => rule.min(0),
+    }),
+    defineField({
+      name: 'totalPages',
+      title: 'Total Pages',
+      type: 'number',
+      hidden: ({document}) => document?.status !== 'reading',
+      validation: (rule) => rule.min(1),
     }),
     defineField({
       name: 'body',
@@ -101,8 +134,16 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
-      subtitle: 'bookAuthor',
+      author: 'bookAuthor',
+      status: 'status',
       media: 'coverImage',
+    },
+    prepare({title, author, status, media}) {
+      return {
+        title,
+        subtitle: status === 'reading' ? `📖 Reading · ${author}` : author,
+        media,
+      }
     },
   },
 })

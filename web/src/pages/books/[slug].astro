@@ -2,10 +2,10 @@
 import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
-import {bookReviewQuery, bookReviewsQuery, bookCoverUrl, readingTime, excerpt} from '../../utils/sanity'
+import {bookReviewQuery, allBookReviewsQuery, bookCoverUrl, readingTime, excerpt} from '../../utils/sanity'
 
 export async function getStaticPaths() {
-  const reviews = await sanityClient.fetch(bookReviewsQuery)
+  const reviews = await sanityClient.fetch(allBookReviewsQuery)
   return reviews.map((review: any) => ({
     params: {slug: review.slug.current},
   }))
@@ -22,7 +22,13 @@ const isMarkdown = typeof review.body === 'string'
 const htmlBody = isMarkdown ? marked(review.body) : null
 const minRead = review.body ? readingTime(review.body) : null
 const cover = bookCoverUrl(review)
-const description = review.body ? excerpt(review.body) : `${review.rating} — a book review by Mihir Wagle`
+const isReading = review.status === 'reading'
+const progress = review.currentPage && review.totalPages
+  ? Math.round((review.currentPage / review.totalPages) * 100)
+  : null
+const description = isReading
+  ? `Currently reading — ${review.bookAuthor}`
+  : review.body ? excerpt(review.body) : `${review.rating} — a book review by Mihir Wagle`
 ---
 
 <Base title={`${review.title} - waglesworld`} description={description} image={cover || undefined} type="article">
@@ -33,9 +39,28 @@ const description = review.body ? excerpt(review.body) : `${review.rating} — a
         <div class="book-info">
           <h1>{review.title}</h1>
           <p class="book-author">by {review.bookAuthor}</p>
-          <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+          {isReading ? (
+            <span class="status-reading">Currently Reading</span>
+          ) : review.rating && (
+            <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+          )}
+          {isReading && progress !== null && (
+            <div class="detail-progress">
+              <div class="detail-bar">
+                <div class="detail-fill" style={`width: ${progress}%`} />
+              </div>
+              <span class="detail-text">{review.currentPage} / {review.totalPages} pages ({progress}%)</span>
+            </div>
+          )}
           <div class="meta">
-            {review.publishedAt && (
+            {isReading && review.startedAt && (
+              <span>Started {new Date(review.startedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}</span>
+            )}
+            {!isReading && review.publishedAt && (
               <time datetime={review.publishedAt}>
                 {new Date(review.publishedAt).toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -44,7 +69,7 @@ const description = review.body ? excerpt(review.body) : `${review.rating} — a
                 })}
               </time>
             )}
-            {minRead && <span>{minRead} min read</span>}
+            {minRead && !isReading && <span>{minRead} min read</span>}
           </div>
           {review.tags && review.tags.length > 0 && (
             <div class="tags">
@@ -153,6 +178,44 @@ const description = review.body ? excerpt(review.body) : `${review.rating} — a
   .rating-dnf {
     background: #fee2e2;
     color: #991b1b;
+  }
+
+  .status-reading {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    width: fit-content;
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .detail-progress {
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-bar {
+    width: 100%;
+    max-width: 200px;
+    height: 6px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .detail-fill {
+    height: 100%;
+    background: #1a1a1a;
+    border-radius: 3px;
+  }
+
+  .detail-text {
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 0.25rem;
+    display: block;
   }
 
   .meta {

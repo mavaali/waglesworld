@@ -1,10 +1,11 @@
 ---
 import Base from '../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
-import {postsQuery, bookReviewsQuery, urlFor, readingTime} from '../utils/sanity'
+import {postsQuery, bookReviewsQuery, currentlyReadingQuery, bookCoverUrl, urlFor, readingTime} from '../utils/sanity'
 
 const posts = await sanityClient.fetch(postsQuery)
 const recentPosts = posts.slice(0, 5)
+const currentlyReading = await sanityClient.fetch(currentlyReadingQuery)
 const allReviews = await sanityClient.fetch(bookReviewsQuery)
 const recentReviews = allReviews.slice(0, 5)
 ---
@@ -36,6 +37,40 @@ const recentReviews = allReviews.slice(0, 5)
           ))}
         </ul>
         <a href="/blog" class="see-all">See all posts &rarr;</a>
+      </section>
+    )
+  }
+
+  {
+    currentlyReading.length > 0 && (
+      <section class="currently-reading">
+        <h2>Currently reading</h2>
+        <div class="reading-cards">
+          {currentlyReading.map((book: any) => {
+            const cover = bookCoverUrl(book)
+            const progress = book.currentPage && book.totalPages
+              ? Math.round((book.currentPage / book.totalPages) * 100)
+              : null
+            return (
+              <div class="reading-card">
+                {cover && <img src={cover} alt={book.title} class="reading-cover" loading="lazy" />}
+                <div class="reading-info">
+                  <span class="post-title">{book.title}</span>
+                  <span class="reading-author">{book.bookAuthor}</span>
+                  {progress !== null && (
+                    <div class="mini-progress">
+                      <div class="mini-bar">
+                        <div class="mini-fill" style={`width: ${progress}%`} />
+                      </div>
+                      <span class="mini-text">{progress}%</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <a href="/reading" class="see-all">See reading list &rarr;</a>
       </section>
     )
   }
@@ -210,4 +245,69 @@ const recentReviews = allReviews.slice(0, 5)
   .rating-really-liked-it { background: #d1fae5; color: #065f46; }
   .rating-it-was-fine { background: #f0f0f0; color: #555; }
   .rating-dnf { background: #fee2e2; color: #991b1b; }
+
+  .currently-reading {
+    margin-bottom: 2rem;
+  }
+
+  .reading-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .reading-card {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+
+  .reading-cover {
+    width: 40px;
+    height: auto;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .reading-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .reading-author {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .mini-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.15rem;
+  }
+
+  .mini-bar {
+    flex: 1;
+    height: 4px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 120px;
+  }
+
+  .mini-fill {
+    height: 100%;
+    background: #1a1a1a;
+    border-radius: 2px;
+  }
+
+  .mini-text {
+    font-size: 0.7rem;
+    color: #999;
+  }
 </style>

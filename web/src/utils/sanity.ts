@@ -70,16 +70,48 @@ export const postQuery = groq`*[_type == "post" && slug.current == $slug][0] {
   categories[]->{title}
 }`
 
-export const bookReviewsQuery = groq`*[_type == "bookReview" && defined(slug.current)] | order(publishedAt desc) {
+export const bookReviewsQuery = groq`*[_type == "bookReview" && defined(slug.current) && status != "reading"] | order(publishedAt desc) {
   _id,
   title,
   slug,
   bookAuthor,
   isbn,
   coverImage,
+  status,
   rating,
   tags,
   publishedAt,
+  body
+}`
+
+export const currentlyReadingQuery = groq`*[_type == "bookReview" && defined(slug.current) && status == "reading"] | order(startedAt desc) {
+  _id,
+  title,
+  slug,
+  bookAuthor,
+  isbn,
+  coverImage,
+  tags,
+  startedAt,
+  currentPage,
+  totalPages,
+  body
+}`
+
+export const allBookReviewsQuery = groq`*[_type == "bookReview" && defined(slug.current)] | order(coalesce(publishedAt, startedAt) desc) {
+  _id,
+  title,
+  slug,
+  bookAuthor,
+  isbn,
+  coverImage,
+  status,
+  rating,
+  tags,
+  startedAt,
+  publishedAt,
+  currentPage,
+  totalPages,
   body
 }`
 
@@ -90,9 +122,13 @@ export const bookReviewQuery = groq`*[_type == "bookReview" && slug.current == $
   bookAuthor,
   isbn,
   coverImage,
+  status,
   rating,
   tags,
+  startedAt,
   publishedAt,
+  currentPage,
+  totalPages,
   body,
   links
 }`
