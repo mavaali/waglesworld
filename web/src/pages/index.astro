@@ -8,9 +8,27 @@ const recentPosts = posts.slice(0, 5)
 const currentlyReading = await sanityClient.fetch(currentlyReadingQuery)
 const allReviews = await sanityClient.fetch(bookReviewsQuery)
 const recentReviews = allReviews.slice(0, 5)
+
+const websiteLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: "Wagle's World",
+  url: 'https://waglesworld.com',
+  description: 'A personal blog by Mihir Wagle',
+  author: {
+    '@type': 'Person',
+    name: 'Mihir Wagle',
+    url: 'https://waglesworld.com/about',
+    sameAs: [
+      'https://www.linkedin.com/in/mihirwagle/',
+      'https://github.com/mavaali',
+    ],
+  },
+})
 ---
 
 <Base title="waglesworld">
+  <script type="application/ld+json" set:html={websiteLd} />
   <h1>waglesworld</h1>
   <p class="intro">Welcome to my corner of the internet.</p>
 

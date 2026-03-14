@@ -42,9 +42,38 @@ const relatedPosts = post.tags?.length
     )
   : []
 
+const wordCount = typeof post.body === 'string'
+  ? post.body.split(/\s+/).filter(Boolean).length
+  : 0
+
+const breadcrumbLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: 'https://waglesworld.com/',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Blog',
+      item: 'https://waglesworld.com/blog/',
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: post.title,
+      item: postUrl,
+    },
+  ],
+})
+
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': 'BlogPosting',
   headline: post.title,
   description: postDescription,
   author: {
@@ -57,6 +86,7 @@ const jsonLd = JSON.stringify({
     ],
   },
   datePublished: post.publishedAt,
+  dateModified: post.publishedAt,
   url: postUrl,
   publisher: {
     '@type': 'Person',
@@ -64,6 +94,8 @@ const jsonLd = JSON.stringify({
     url: 'https://waglesworld.com',
   },
   ...(postImage && {image: postImage}),
+  ...(wordCount > 0 && {wordCount}),
+  ...(post.tags?.length && {keywords: post.tags.join(', ')}),
   mainEntityOfPage: {
     '@type': 'WebPage',
     '@id': postUrl,
@@ -73,6 +105,7 @@ const jsonLd = JSON.stringify({
 
 <Base title={`${post.title} - waglesworld`} description={postDescription} image={postImage} type="article">
   <script type="application/ld+json" set:html={jsonLd} />
+  <script type="application/ld+json" set:html={breadcrumbLd} />
   <article>
     <header>
       <h1>{post.title}</h1>
@@ -270,6 +303,35 @@ const jsonLd = JSON.stringify({
   .body :global(a) {
     color: #0066cc;
     text-decoration: underline;
+  }
+
+  .body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .body :global(thead) {
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .body :global(th) {
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .body :global(td) {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .body :global(tbody tr:hover) {
+    background: #fafafa;
   }
 
   .back {

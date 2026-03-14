@@ -268,6 +268,35 @@ const description = isReading
     text-decoration: underline;
   }
 
+  .body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .body :global(thead) {
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .body :global(th) {
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .body :global(td) {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .body :global(tbody tr:hover) {
+    background: #fafafa;
+  }
+
   .buy-links {
     margin-top: 2rem;
     padding-top: 1.5rem;
