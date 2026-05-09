@@ -23,7 +23,7 @@ const reviews = await sanityClient.fetch(bookReviewsQuery)
                   <span class="book-title">{review.title}</span>
                   <span class="book-author">by {review.bookAuthor}</span>
                   <div class="post-meta">
-                    <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+                    {review.rating && <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>}
                     {review.publishedAt &&
                       new Date(review.publishedAt).toLocaleDateString('en-US', {
                         year: 'numeric',

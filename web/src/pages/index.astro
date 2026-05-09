@@ -103,7 +103,7 @@ const websiteLd = JSON.stringify({
               <a href={`/books/${review.slug.current}`}>
                 <span class="post-title">{review.title}</span>
                 <span class="post-meta">
-                  <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+                  {review.rating && <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>}
                   {review.bookAuthor}
                 </span>
               </a>
