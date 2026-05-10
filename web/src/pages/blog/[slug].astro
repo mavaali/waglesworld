@@ -3,8 +3,10 @@ import Base from '../../layouts/Base.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
 import markedKatex from 'marked-katex-extension'
+import markedFootnote from 'marked-footnote'
 
 marked.use(markedKatex({throwOnError: false}))
+marked.use(markedFootnote())
 import {PortableText} from 'astro-portabletext'
 import groq from 'groq'
 import {postQuery, postsQuery, urlFor, readingTime, excerpt} from '../../utils/sanity'
