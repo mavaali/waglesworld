@@ -6,8 +6,37 @@ interface Props {
   type?: string
 }
 
-const {title, description = 'waglesworld - a personal blog', image, type = 'website'} = Astro.props
+const {title, description = 'Mihir Wagle - personal blog on agentic AI, data platforms, and cricket.', image, type = 'website'} = Astro.props
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+
+const siteIdentityLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': 'https://waglesworld.com/#website',
+      url: 'https://waglesworld.com/',
+      name: "Mihir Wagle's Blog",
+      alternateName: 'waglesworld',
+      publisher: {'@id': 'https://waglesworld.com/#person'},
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'Person',
+      '@id': 'https://waglesworld.com/#person',
+      name: 'Mihir Wagle',
+      url: 'https://waglesworld.com/about',
+      jobTitle: 'Technologist',
+      worksFor: {'@type': 'Organization', name: 'Microsoft'},
+      alumniOf: {'@type': 'CollegeOrUniversity', name: 'IIT Bombay'},
+      sameAs: [
+        'https://www.linkedin.com/in/mihirwagle/',
+        'https://github.com/mavaali',
+        'https://bsky.app/profile/waglesworld.com',
+      ],
+    },
+  ],
+})
 ---
 
 <!doctype html>
@@ -24,13 +53,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:site_name" content="waglesworld" />
+    <meta property="og:site_name" content="Mihir Wagle's Blog" />
     {image && <meta property="og:image" content={image} />}
     <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {image && <meta name="twitter:image" content={image} />}
     <title>{title}</title>
+    <script type="application/ld+json" set:html={siteIdentityLd} />
   </head>
   <body>
     <header>
