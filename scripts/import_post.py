@@ -29,6 +29,11 @@ PROJECT = "3xigt9u7"
 DATASET = "production"
 API = f"https://{PROJECT}.api.sanity.io/v2024-01-01"
 
+# Matches markdown images pointing at a local/relative file. Skips http(s)://
+# URLs and absolute paths. Group 1 = alt text, group 2 = filename (leading
+# ./ is consumed and not captured).
+IMG_RE = r"!\[([^\]]*)\]\((?!https?://|/)(?:\./)?([^)]+)\)"
+
 
 def slugify(title: str) -> str:
     s = title.lower()
@@ -108,7 +113,7 @@ def main() -> None:
     slug = args.slug or slugify(title)
 
     # Collect inline image refs in order of appearance
-    img_refs = re.findall(r"!\[[^\]]*\]\(\.\/([^)]+)\)", body)
+    img_refs = [m.group(2) for m in re.finditer(IMG_RE, body)]
     seen = set()
     img_files = []
     for f in img_refs:
@@ -143,9 +148,7 @@ def main() -> None:
 
     if args.dry_run:
         # Show what the body would look like with placeholder URLs
-        rewritten = body
-        for f in img_files:
-            rewritten = rewritten.replace(f"./{f}", f"<<CDN:{f}>>")
+        rewritten = re.sub(IMG_RE, lambda m: f"![{m.group(1)}](<<CDN:{m.group(2)}>>)", body)
         rewritten = re.sub(
             r"```mermaid\n.*?\n```",
             lambda m: f"![mermaid diagram](<<CDN:{mermaid_files.pop(0)}>>)" if mermaid_files else m.group(0),
@@ -173,7 +176,7 @@ def main() -> None:
     def repl(m: re.Match) -> str:
         alt, fname = m.group(1), m.group(2)
         return f"![{alt}]({asset_map[fname][1]})"
-    new_body = re.sub(r"!\[([^\]]*)\]\(\.\/([^)]+)\)", repl, body)
+    new_body = re.sub(IMG_RE, repl, body)
 
     # Rewrite body: mermaid blocks → image refs
     mermaid_iter = iter(mermaid_files)
