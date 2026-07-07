@@ -25,7 +25,7 @@ const jsonLd = JSON.stringify({
 
 <Base title="About Mihir Wagle - waglesworld" description="About Mihir Wagle - technologist at Microsoft, IIT Bombay alum, writing about agentic AI, data platforms, and cricket.">
   <script type="application/ld+json" set:html={jsonLd} />
-  <h1>About Mihir Wagle</h1>
+  <h1>About Mihir Wagle<span class="accent-dot">.</span></h1>
   <div class="bio">
     <p>By day, I am a technologist at Microsoft; by weekend, I am a builder, hiker, and enthusiast of detailed universes.</p>
 
@@ -33,37 +33,99 @@ const jsonLd = JSON.stringify({
 
     <p>This blog is a collection of my notes on the things that occupy my mind — ranging from the future of agentic AI and T20 cricket to the best historical sites to visit on a family trip. I value specific metrics over vague claims and clear mechanisms over corporate-speak, a philosophy I try to bring to both my professional work and my personal writing.</p>
 
+    <div class="facts">
+      <div class="fact">
+        <span class="fact-label">Day job</span>
+        <span class="fact-value">Technologist at Microsoft</span>
+      </div>
+      <div class="fact">
+        <span class="fact-label">Alma mater</span>
+        <span class="fact-value">IIT Bombay</span>
+      </div>
+      <div class="fact">
+        <span class="fact-label">Writing about</span>
+        <span class="fact-value">Agentic AI &middot; Data platforms &middot; Cricket</span>
+      </div>
+    </div>
+
     <h2>Find me elsewhere</h2>
-    <ul>
-      <li><a href="https://www.linkedin.com/in/mihirwagle" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-      <li><a href="https://bsky.app/profile/waglesworld.com" target="_blank" rel="noopener noreferrer">Bluesky</a></li>
-    </ul>
+    <div class="elsewhere">
+      <a href="https://www.linkedin.com/in/mihirwagle" class="elsewhere-btn plain" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://bsky.app/profile/waglesworld.com" class="elsewhere-btn plain" target="_blank" rel="noopener noreferrer">Bluesky</a>
+      <a href="https://github.com/mavaali" class="elsewhere-btn plain" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
   </div>
 </Base>
 
 <style>
+  .accent-dot {
+    color: var(--accent);
+  }
+
   .bio {
-    font-size: 1.05rem;
+    font-size: 1.06rem;
     line-height: 1.8;
   }
 
   .bio p {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.35rem;
   }
 
   .bio h2 {
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
   }
 
-  .bio ul {
-    list-style: none;
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .fact {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem 1.15rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
   }
 
-  .bio a {
-    color: #0066cc;
-    text-decoration: underline;
+  .fact-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .fact-value {
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .elsewhere {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .elsewhere-btn {
+    display: inline-block;
+    padding: 0.45rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: var(--surface);
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+
+  .elsewhere-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
   }
 </style>

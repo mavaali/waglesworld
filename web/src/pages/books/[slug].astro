@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro'
+import Comments from '../../components/Comments.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
 import {bookReviewQuery, allBookReviewsQuery, bookCoverUrl, readingTime, excerpt} from '../../utils/sanity'
@@ -34,6 +35,7 @@ const description = isReading
 <Base title={`${review.title} - waglesworld`} description={description} image={cover || undefined} type="article">
   <article>
     <header>
+      <a href="/books" class="crumb">&larr; Books</a>
       <div class="book-header">
         {cover && <img src={cover} alt={review.title} class="cover" />}
         <div class="book-info">
@@ -90,43 +92,36 @@ const description = isReading
 
     {review.links && (review.links.amazon || review.links.bookshop || review.links.libby) && (
       <div class="buy-links">
-        <h3>Get this book</h3>
+        <p class="section-label">Get this book</p>
         <div class="link-list">
-          {review.links.amazon && <a href={review.links.amazon} target="_blank" rel="noopener noreferrer">Amazon</a>}
-          {review.links.bookshop && <a href={review.links.bookshop} target="_blank" rel="noopener noreferrer">Bookshop.org</a>}
-          {review.links.libby && <a href={review.links.libby} target="_blank" rel="noopener noreferrer">Libby</a>}
+          {review.links.amazon && <a href={review.links.amazon} class="buy-btn plain" target="_blank" rel="noopener noreferrer">Amazon</a>}
+          {review.links.bookshop && <a href={review.links.bookshop} class="buy-btn plain" target="_blank" rel="noopener noreferrer">Bookshop.org</a>}
+          {review.links.libby && <a href={review.links.libby} class="buy-btn plain" target="_blank" rel="noopener noreferrer">Libby</a>}
         </div>
       </div>
     )}
   </article>
 
-  <a href="/books" class="back">&larr; Back to books</a>
-
-  <section class="comments">
-    <script
-      src="https://giscus.app/client.js"
-      data-repo="mavaali/waglesworld"
-      data-repo-id="R_kgDORLJ8TQ"
-      data-category="General"
-      data-category-id="DIC_kwDORLJ8Tc4C2CHX"
-      data-mapping="pathname"
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="top"
-      data-theme="light"
-      data-lang="en"
-      data-loading="lazy"
-      crossorigin="anonymous"
-      async
-    ></script>
-  </section>
+  <Comments />
 </Base>
 
 <style>
+  .crumb {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+  }
+
+  .crumb:hover {
+    color: var(--accent);
+  }
+
   .book-header {
     display: flex;
-    gap: 1.5rem;
+    gap: 1.75rem;
     align-items: flex-start;
     margin-bottom: 2rem;
   }
@@ -134,62 +129,33 @@ const description = isReading
   .cover {
     width: 150px;
     height: auto;
-    border-radius: 4px;
+    border-radius: 6px;
     flex-shrink: 0;
+    box-shadow: var(--shadow-hover);
   }
 
   .book-info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.35rem;
+  }
+
+  .book-info h1 {
+    font-size: 2rem;
+    margin-bottom: 0;
   }
 
   .book-author {
-    color: #666;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 0.35rem;
   }
 
-  .rating {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 3px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
+  .book-info .rating,
+  .book-info .status-reading {
     width: fit-content;
-  }
-
-  .rating-obsessed {
-    background: #fef3c7;
-    color: #92400e;
-  }
-
-  .rating-really-liked-it {
-    background: #d1fae5;
-    color: #065f46;
-  }
-
-  .rating-it-was-fine {
-    background: #f0f0f0;
-    color: #555;
-  }
-
-  .rating-dnf {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-
-  .status-reading {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 3px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    width: fit-content;
-    background: #dbeafe;
-    color: #1e40af;
+    margin-bottom: 0.35rem;
+    font-size: 0.8rem;
   }
 
   .detail-progress {
@@ -198,23 +164,24 @@ const description = isReading
 
   .detail-bar {
     width: 100%;
-    max-width: 200px;
+    max-width: 220px;
     height: 6px;
-    background: #f0f0f0;
-    border-radius: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
     overflow: hidden;
   }
 
   .detail-fill {
     height: 100%;
-    background: #1a1a1a;
-    border-radius: 3px;
+    background: var(--accent);
+    border-radius: 999px;
   }
 
   .detail-text {
     font-size: 0.8rem;
-    color: #999;
-    margin-top: 0.25rem;
+    color: var(--faint);
+    margin-top: 0.3rem;
     display: block;
   }
 
@@ -222,63 +189,58 @@ const description = isReading
     display: flex;
     align-items: center;
     gap: 1rem;
-    color: #666;
+    color: var(--muted);
     font-size: 0.875rem;
+    flex-wrap: wrap;
   }
 
   .tags {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     margin-top: 0.5rem;
     flex-wrap: wrap;
   }
 
-  .tag {
-    background: #f0f0f0;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.8rem;
-    color: #555;
-  }
-
   .body {
-    font-size: 1.05rem;
+    font-size: 1.06rem;
     line-height: 1.8;
     margin-top: 2rem;
   }
 
   .body :global(p) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.35rem;
   }
 
   .body :global(h2) {
-    margin-top: 2rem;
+    margin-top: 2.25rem;
     margin-bottom: 0.75rem;
   }
 
   .body :global(blockquote) {
-    border-left: 3px solid #ddd;
-    padding-left: 1rem;
-    color: #555;
+    border-left: 3px solid var(--accent);
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    color: var(--muted);
     margin: 1.5rem 0;
+    font-style: italic;
   }
 
-  .body :global(a) {
-    color: #0066cc;
-    text-decoration: underline;
+  .body :global(ul),
+  .body :global(ol) {
+    margin-bottom: 1.35rem;
+    padding-left: 1.5rem;
   }
 
   .body :global(table) {
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     overflow-x: auto;
     display: block;
   }
 
   .body :global(thead) {
-    border-bottom: 2px solid #1a1a1a;
+    border-bottom: 2px solid var(--text);
   }
 
   .body :global(th) {
@@ -290,49 +252,43 @@ const description = isReading
 
   .body :global(td) {
     padding: 0.6rem 1rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
   }
 
   .body :global(tbody tr:hover) {
-    background: #fafafa;
+    background: var(--surface-2);
   }
 
   .buy-links {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
-  }
-
-  .buy-links h3 {
-    font-size: 1rem;
-    margin-bottom: 0.75rem;
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border);
   }
 
   .link-list {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
-  .link-list a {
-    color: #0066cc;
-    text-decoration: underline;
-    font-size: 0.95rem;
-  }
-
-  .back {
+  .buy-btn {
     display: inline-block;
-    margin-top: 3rem;
-    color: #666;
-    font-size: 0.875rem;
+    padding: 0.45rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: var(--surface);
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
   }
 
-  .comments {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
+  .buy-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 540px) {
     .book-header {
       flex-direction: column;
       align-items: center;
@@ -340,15 +296,25 @@ const description = isReading
     }
 
     .cover {
-      width: 120px;
+      width: 130px;
     }
 
     .book-info {
       align-items: center;
     }
 
+    .meta {
+      justify-content: center;
+    }
+
     .tags {
       justify-content: center;
+    }
+
+    .book-info .rating,
+    .book-info .status-reading {
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 </style>

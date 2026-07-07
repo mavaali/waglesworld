@@ -11,6 +11,8 @@ export default defineConfig({
       projectId: '3xigt9u7',
       dataset: 'production',
       useCdn: false,
+      // Allows offline/sandboxed builds to point at a mock API
+      ...(process.env.SANITY_API_HOST ? {apiHost: process.env.SANITY_API_HOST} : {}),
     }),
     sitemap(),
   ],
