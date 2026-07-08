@@ -1,0 +1,64 @@
+---
+// Giscus comments, injected client-side so the theme matches the site's
+// light/dark mode and stays in sync when the user toggles it.
+---
+
+<section class="comments">
+  <h2 class="comments-title">Comments</h2>
+  <div id="giscus-container"></div>
+</section>
+
+<script>
+  const container = document.getElementById('giscus-container')
+
+  const giscusTheme = (theme: string) => (theme === 'dark' ? 'noborder_dark' : 'noborder_light')
+
+  function loadGiscus() {
+    if (!container) return
+    const script = document.createElement('script')
+    script.src = 'https://giscus.app/client.js'
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    const attrs: Record<string, string> = {
+      'data-repo': 'mavaali/waglesworld',
+      'data-repo-id': 'R_kgDORLJ8TQ',
+      'data-category': 'General',
+      'data-category-id': 'DIC_kwDORLJ8Tc4C2CHX',
+      'data-mapping': 'pathname',
+      'data-strict': '0',
+      'data-reactions-enabled': '1',
+      'data-emit-metadata': '0',
+      'data-input-position': 'top',
+      'data-theme': giscusTheme(document.documentElement.dataset.theme || 'light'),
+      'data-lang': 'en',
+      'data-loading': 'lazy',
+    }
+    for (const [key, value] of Object.entries(attrs)) {
+      script.setAttribute(key, value)
+    }
+    container.appendChild(script)
+  }
+
+  loadGiscus()
+
+  window.addEventListener('themechange', (event) => {
+    const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame')
+    iframe?.contentWindow?.postMessage(
+      {giscus: {setConfig: {theme: giscusTheme((event as CustomEvent).detail)}}},
+      'https://giscus.app'
+    )
+  })
+</script>
+
+<style>
+  .comments {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .comments-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.25rem;
+  }
+</style>

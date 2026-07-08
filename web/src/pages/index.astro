@@ -1,53 +1,62 @@
 ---
 import Base from '../layouts/Base.astro'
+import Subscribe from '../components/Subscribe.astro'
 import {sanityClient} from 'sanity:client'
-import {postsQuery, bookReviewsQuery, currentlyReadingQuery, bookCoverUrl, urlFor, readingTime} from '../utils/sanity'
+import {postsQuery, bookReviewsQuery, currentlyReadingQuery, bookCoverUrl, readingTime} from '../utils/sanity'
 
 const posts = await sanityClient.fetch(postsQuery)
 const recentPosts = posts.slice(0, 5)
 const currentlyReading = await sanityClient.fetch(currentlyReadingQuery)
 const allReviews = await sanityClient.fetch(bookReviewsQuery)
-const recentReviews = allReviews.slice(0, 5)
+const recentReviews = allReviews.slice(0, 4)
+
+const formatDate = (date: string) =>
+  new Date(date).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})
 ---
 
 <Base
   title="Mihir Wagle - waglesworld"
   description="Mihir Wagle's personal blog. Notes on agentic AI, data platforms, and cricket from a technologist at Microsoft and IIT Bombay alum."
 >
-  <h1>Mihir Wagle</h1>
-  <p class="intro">Technologist at Microsoft. IIT Bombay alum. Writing about agentic AI, data platforms, and cricket. Welcome to my corner of the internet.</p>
+  <section class="hero">
+    <p class="hero-greeting">Hi, I'm</p>
+    <h1>Mihir Wagle<span class="accent-dot">.</span></h1>
+    <p class="intro">
+      Technologist at Microsoft. IIT Bombay alum. I write about <strong>agentic AI</strong>,
+      <strong>data platforms</strong>, and <strong>cricket</strong> — welcome to my corner of the internet.
+    </p>
+    <div class="hero-links">
+      <a href="/blog" class="btn-primary plain">Read the blog</a>
+      <a href="/about" class="btn-ghost plain">About me &rarr;</a>
+    </div>
+  </section>
 
   {
     recentPosts.length > 0 && (
-      <section class="recent-posts">
-        <h2>Recent posts</h2>
-        <ul>
+      <section class="home-section">
+        <p class="section-label">Recent posts</p>
+        <ul class="post-list">
           {recentPosts.map((post: any) => (
             <li>
-              <a href={`/blog/${post.slug.current}`}>
+              <a href={`/blog/${post.slug.current}`} class="post-row plain">
                 <span class="post-title">{post.title}</span>
                 <span class="post-meta">
-                  {post.publishedAt &&
-                    new Date(post.publishedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  {post.body && ` \u00b7 ${readingTime(post.body)} min read`}
+                  {post.publishedAt && formatDate(post.publishedAt)}
+                  {post.body && ` · ${readingTime(post.body)} min`}
                 </span>
               </a>
             </li>
           ))}
         </ul>
-        <a href="/blog" class="see-all">See all posts &rarr;</a>
+        <a href="/blog" class="see-all">All posts &rarr;</a>
       </section>
     )
   }
 
   {
     currentlyReading.length > 0 && (
-      <section class="currently-reading">
-        <h2>Currently reading</h2>
+      <section class="home-section">
+        <p class="section-label">Currently reading</p>
         <div class="reading-cards">
           {currentlyReading.map((book: any) => {
             const cover = bookCoverUrl(book)
@@ -73,204 +82,181 @@ const recentReviews = allReviews.slice(0, 5)
             )
           })}
         </div>
-        <a href="/reading" class="see-all">See reading list &rarr;</a>
+        <a href="/reading" class="see-all">Reading list &rarr;</a>
       </section>
     )
   }
 
   {
     recentReviews.length > 0 && (
-      <section class="recent-reads">
-        <h2>Recent reads</h2>
-        <ul>
+      <section class="home-section">
+        <p class="section-label">Recent reads</p>
+        <ul class="post-list">
           {recentReviews.map((review: any) => (
             <li>
-              <a href={`/books/${review.slug.current}`}>
+              <a href={`/books/${review.slug.current}`} class="post-row plain">
                 <span class="post-title">{review.title}</span>
                 <span class="post-meta">
-                  {review.rating && <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>}
+                  {review.rating && (
+                    <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+                  )}
                   {review.bookAuthor}
                 </span>
               </a>
             </li>
           ))}
         </ul>
-        <a href="/books" class="see-all">See all books &rarr;</a>
+        <a href="/books" class="see-all">All books &rarr;</a>
       </section>
     )
   }
 
-  <section class="subscribe">
-    <h2>Subscribe</h2>
-    <p>Get new posts delivered to your inbox.</p>
-    <form class="subscribe-form" action="https://app.kit.com/forms/9065996/subscriptions" method="post" data-sv-form="9065996" data-uid="a1f891a000" data-format="inline" target="_blank">
-      <input type="email" name="email_address" placeholder="your@email.com" required />
-      <button type="submit">Subscribe</button>
-    </form>
-    <p class="consent-note">By subscribing, you agree to our <a href="/privacy">privacy policy</a>. Unsubscribe anytime.</p>
-    <p class="rss-link">Or subscribe via <a href="/rss.xml">RSS</a></p>
-  </section>
+  <Subscribe />
 </Base>
 
 <style>
-  .intro {
-    color: #666;
-    margin-bottom: 3rem;
-    font-size: 1.1rem;
+  .hero {
+    margin: 1.5rem 0 3.5rem;
   }
 
-  .recent-posts ul {
+  .hero-greeting {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .accent-dot {
+    color: var(--accent);
+  }
+
+  .intro {
+    color: var(--muted);
+    font-size: 1.15rem;
+    line-height: 1.7;
+    max-width: 36rem;
+  }
+
+  .intro strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .hero-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  :global(:root[data-theme='dark']) .btn-primary {
+    color: #1c1917;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--muted);
+    transition: color 0.15s ease;
+  }
+
+  .btn-ghost:hover {
+    color: var(--accent);
+  }
+
+  .home-section {
+    margin-bottom: 3rem;
+  }
+
+  .post-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
   }
 
-  .recent-posts a {
+  .post-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 1rem;
-    padding: 0.5rem 0;
+    padding: 0.7rem 0.75rem;
+    margin: 0 -0.75rem;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+  }
+
+  .post-row:hover {
+    background: var(--surface-2);
+  }
+
+  .post-row:hover .post-title {
+    color: var(--accent);
   }
 
   .post-title {
     font-weight: 500;
+    transition: color 0.15s ease;
   }
 
   .post-meta {
-    color: #666;
-    font-size: 0.875rem;
+    color: var(--faint);
+    font-size: 0.85rem;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
   }
 
   .see-all {
     display: inline-block;
-    margin-top: 1.5rem;
-    color: #666;
-    font-size: 0.875rem;
-  }
-
-  .subscribe {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
-  }
-
-  .subscribe p {
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  .subscribe-form {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .subscribe-form input {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: inherit;
-  }
-
-  .subscribe-form button {
-    padding: 0.5rem 1.25rem;
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .subscribe-form button:hover {
-    background: #333;
-  }
-
-  .consent-note {
-    font-size: 0.75rem;
-    color: #999;
-    margin-top: 0.5rem;
-    margin-bottom: 0;
-  }
-
-  .consent-note a {
-    color: #999;
-    text-decoration: underline;
-  }
-
-  .rss-link {
-    font-size: 0.8rem;
-    margin-top: 0.5rem;
-  }
-
-  .rss-link a {
-    color: #0066cc;
-    text-decoration: underline;
-  }
-
-  .recent-reads ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .recent-reads a {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-    padding: 0.5rem 0;
-  }
-
-  .recent-reads .see-all {
-    display: inline-block;
-    margin-top: 1.5rem;
-    color: #666;
-    font-size: 0.875rem;
-  }
-
-  .rating {
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    margin-right: 0.25rem;
-  }
-
-  .rating-obsessed { background: #fef3c7; color: #92400e; }
-  .rating-really-liked-it { background: #d1fae5; color: #065f46; }
-  .rating-it-was-fine { background: #f0f0f0; color: #555; }
-  .rating-dnf { background: #fee2e2; color: #991b1b; }
-
-  .currently-reading {
-    margin-bottom: 2rem;
+    margin-top: 0.75rem;
+    font-size: 0.88rem;
+    font-weight: 500;
   }
 
   .reading-cards {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    margin-top: 1rem;
   }
 
   .reading-card {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
     align-items: center;
-    padding: 0.5rem 0;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
   }
 
   .reading-cover {
-    width: 40px;
+    width: 44px;
     height: auto;
-    border-radius: 3px;
+    border-radius: 4px;
     flex-shrink: 0;
   }
 
@@ -283,7 +269,7 @@ const recentReviews = allReviews.slice(0, 5)
   }
 
   .reading-author {
-    color: #666;
+    color: var(--muted);
     font-size: 0.85rem;
   }
 
@@ -291,26 +277,39 @@ const recentReviews = allReviews.slice(0, 5)
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.15rem;
+    margin-top: 0.3rem;
   }
 
   .mini-bar {
     flex: 1;
-    height: 4px;
-    background: #f0f0f0;
-    border-radius: 2px;
+    height: 5px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
     overflow: hidden;
-    max-width: 120px;
+    max-width: 140px;
   }
 
   .mini-fill {
     height: 100%;
-    background: #1a1a1a;
-    border-radius: 2px;
+    background: var(--accent);
+    border-radius: 999px;
   }
 
   .mini-text {
-    font-size: 0.7rem;
-    color: #999;
+    font-size: 0.72rem;
+    color: var(--faint);
+  }
+
+  @media (max-width: 540px) {
+    .hero h1 {
+      font-size: 2.3rem;
+    }
+
+    .post-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+    }
   }
 </style>

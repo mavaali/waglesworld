@@ -8,6 +8,16 @@ interface Props {
 
 const {title, description = 'Mihir Wagle - personal blog on agentic AI, data platforms, and cricket.', image, type = 'website'} = Astro.props
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+const currentPath = Astro.url.pathname
+
+const navLinks = [
+  {href: '/blog', label: 'Blog'},
+  {href: '/reading', label: 'Reading'},
+  {href: '/books', label: 'Books'},
+  {href: '/about', label: 'About'},
+]
+
+const isActive = (href: string) => currentPath === href || currentPath.startsWith(href + '/')
 
 const siteIdentityLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -47,6 +57,12 @@ const siteIdentityLd = JSON.stringify({
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHkXFb6TvkY0dBNTkPcGpiMpQH+Pp5fCo0dDXw" crossorigin="anonymous" />
     <link rel="alternate" type="application/rss+xml" title="Wagle's World RSS Feed" href="/rss.xml" />
     <meta property="og:type" content={type} />
@@ -61,31 +77,70 @@ const siteIdentityLd = JSON.stringify({
     {image && <meta name="twitter:image" content={image} />}
     <title>{title}</title>
     <script type="application/ld+json" set:html={siteIdentityLd} />
+    <script is:inline>
+      const stored = localStorage.getItem('theme')
+      const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      document.documentElement.dataset.theme = theme
+    </script>
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <header>
-      <nav>
-        <a href="/" class="site-title">waglesworld</a>
-        <a href="/blog">blog</a>
-        <a href="/reading">reading</a>
-        <a href="/books">books</a>
-        <a href="/about">about</a>
+      <nav aria-label="Main">
+        <a href="/" class="site-title">waglesworld<span class="title-dot">.</span></a>
+        <div class="nav-links">
+          {navLinks.map((link) => (
+            <a href={link.href} class:list={{active: isActive(link.href)}} aria-current={isActive(link.href) ? 'page' : undefined}>
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+          <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
       </nav>
     </header>
-    <main>
+    <main id="main">
       <slot />
     </main>
     <footer>
-      <p>&copy; {new Date().getFullYear()} waglesworld &middot; <a href="/privacy">Privacy</a></p>
-      <div class="socials">
-        <a href="https://www.linkedin.com/in/mihirwagle" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        </a>
-        <a href="https://bsky.app/profile/waglesworld.com" target="_blank" rel="noopener noreferrer" aria-label="Bluesky">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.785 2.627 3.59 3.513 6.182 3.2-3.882.562-8.146 1.96-5.025 6.726C3.87 23.6 7.862 21.449 12 15.882c4.138 5.567 8.086 7.633 10.22 4.291 3.12-4.766-1.144-6.164-5.026-6.726 2.592.313 5.397-.573 6.182-3.2.246-.828.624-5.788.624-6.479 0-.688-.139-1.86-.902-2.203-.659-.3-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/></svg>
-        </a>
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="footer-name">waglesworld<span class="title-dot">.</span></span>
+          <p class="footer-tagline">Notes on agentic AI, data platforms, and cricket.</p>
+        </div>
+        <div class="socials">
+          <a href="https://www.linkedin.com/in/mihirwagle" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="https://bsky.app/profile/waglesworld.com" target="_blank" rel="noopener noreferrer" aria-label="Bluesky">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.785 2.627 3.59 3.513 6.182 3.2-3.882.562-8.146 1.96-5.025 6.726C3.87 23.6 7.862 21.449 12 15.882c4.138 5.567 8.086 7.633 10.22 4.291 3.12-4.766-1.144-6.164-5.026-6.726 2.592.313 5.397-.573 6.182-3.2.246-.828.624-5.788.624-6.479 0-.688-.139-1.86-.902-2.203-.659-.3-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/></svg>
+          </a>
+          <a href="https://github.com/mavaali" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </a>
+          <a href="/rss.xml" aria-label="RSS feed">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.503 20.752c0 1.794-1.456 3.248-3.251 3.248S0 22.546 0 20.752s1.456-3.248 3.252-3.248 3.251 1.454 3.251 3.248zM1.677 6.462v4.694c6.554 0 11.867 5.312 11.867 11.865h4.695c0-9.14-7.42-16.559-16.562-16.559zM1.68 0v4.695c10.633 0 19.314 8.682 19.314 19.314H24C24 10.915 13.084 0 1.68 0z"/></svg>
+          </a>
+        </div>
       </div>
+      <p class="footer-legal">&copy; {new Date().getFullYear()} Mihir Wagle &middot; <a href="/privacy">Privacy</a> &middot; <a href="/llms.txt">llms.txt</a></p>
     </footer>
+    <script>
+      const btn = document.getElementById('theme-toggle')
+      btn?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+        document.documentElement.dataset.theme = next
+        localStorage.setItem('theme', next)
+        window.dispatchEvent(new CustomEvent('themechange', {detail: next}))
+      })
+    </script>
     <style is:global>
       * {
         margin: 0;
@@ -93,71 +148,70 @@ const siteIdentityLd = JSON.stringify({
         box-sizing: border-box;
       }
 
+      :root {
+        --bg: #faf9f7;
+        --surface: #ffffff;
+        --surface-2: #f4f1ec;
+        --text: #1c1917;
+        --muted: #57534e;
+        --faint: #8a8480;
+        --border: #e8e4de;
+        --accent: #c2410c;
+        --accent-hover: #9a3412;
+        --accent-soft: rgba(194, 65, 12, 0.08);
+        --shadow: 0 1px 2px rgba(28, 25, 23, 0.04), 0 4px 16px rgba(28, 25, 23, 0.05);
+        --shadow-hover: 0 2px 4px rgba(28, 25, 23, 0.06), 0 8px 24px rgba(28, 25, 23, 0.09);
+        color-scheme: light;
+      }
+
+      :root[data-theme='dark'] {
+        --bg: #141110;
+        --surface: #1d1917;
+        --surface-2: #262120;
+        --text: #ece8e3;
+        --muted: #aaa39d;
+        --faint: #7c756f;
+        --border: #2e2926;
+        --accent: #fb923c;
+        --accent-hover: #fdba74;
+        --accent-soft: rgba(251, 146, 60, 0.1);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.25);
+        --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
+        color-scheme: dark;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
-        color: #1a1a1a;
-        max-width: 720px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.7;
+        color: var(--text);
+        background: var(--bg);
+        max-width: 46rem;
         margin: 0 auto;
-        padding: 2rem 1rem;
+        padding: 1.5rem 1.25rem 2rem;
+        font-size: 1rem;
+        -webkit-font-smoothing: antialiased;
+        transition: background 0.2s ease, color 0.2s ease;
       }
 
-      header nav {
-        display: flex;
-        gap: 1.5rem;
-        align-items: baseline;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 2rem;
+      ::selection {
+        background: var(--accent);
+        color: var(--bg);
       }
 
-      .site-title {
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin-right: auto;
-      }
-
-      a {
-        color: #1a1a1a;
-        text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      main {
-        min-height: 60vh;
-      }
-
-      footer {
-        margin-top: 4rem;
-        padding-top: 2rem;
-        border-top: 1px solid #eee;
-        color: #666;
-        font-size: 0.875rem;
-      }
-
-      .socials {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 0.5rem;
-        align-items: center;
-      }
-
-      .socials a {
-        color: #999;
-        display: flex;
-        transition: color 0.15s;
-      }
-
-      .socials a:hover {
-        color: #1a1a1a;
-        text-decoration: none;
+      h1, h2, h3, h4 {
+        font-family: 'Fraunces', Georgia, serif;
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.01em;
+        text-wrap: balance;
       }
 
       h1 {
-        font-size: 2rem;
+        font-size: 2.25rem;
         margin-bottom: 1rem;
       }
 
@@ -166,10 +220,315 @@ const siteIdentityLd = JSON.stringify({
         margin-bottom: 0.75rem;
       }
 
+      a {
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      main a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+        text-underline-offset: 3px;
+        transition: text-decoration-color 0.15s ease, color 0.15s ease;
+      }
+
+      main a:hover {
+        color: var(--accent-hover);
+        text-decoration-color: currentColor;
+      }
+
+      main a.plain {
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        background: var(--accent);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 0 0 6px 6px;
+        z-index: 100;
+      }
+
+      .skip-link:focus {
+        left: 1rem;
+      }
+
+      /* ---------- header ---------- */
+
+      header nav {
+        display: flex;
+        gap: 1.4rem;
+        align-items: center;
+        padding: 0.75rem 0 1.5rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .site-title {
+        font-family: 'Fraunces', Georgia, serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin-right: auto;
+        letter-spacing: -0.015em;
+      }
+
+      .title-dot {
+        color: var(--accent);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1.3rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: var(--muted);
+        padding: 0.15rem 0;
+        border-bottom: 2px solid transparent;
+        transition: color 0.15s ease, border-color 0.15s ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--text);
+      }
+
+      .nav-links a.active {
+        color: var(--text);
+        border-bottom-color: var(--accent);
+      }
+
+      #theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.1rem;
+        height: 2.1rem;
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      }
+
+      #theme-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+
+      :root[data-theme='dark'] .icon-moon,
+      :root:not([data-theme='dark']) .icon-sun {
+        display: none;
+      }
+
+      main {
+        min-height: 60vh;
+      }
+
+      /* ---------- shared bits ---------- */
+
+      .section-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1rem;
+      }
+
+      .tag {
+        display: inline-block;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 0.1rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+
+      .rating {
+        display: inline-block;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .rating-obsessed { background: #fef3c7; color: #92400e; }
+      .rating-really-liked-it { background: #d1fae5; color: #065f46; }
+      .rating-it-was-fine { background: #e7e5e4; color: #57534e; }
+      .rating-dnf { background: #fee2e2; color: #991b1b; }
+
+      :root[data-theme='dark'] .rating-obsessed { background: #453413; color: #fcd34d; }
+      :root[data-theme='dark'] .rating-really-liked-it { background: #103c2e; color: #6ee7b7; }
+      :root[data-theme='dark'] .rating-it-was-fine { background: #2e2926; color: #aaa39d; }
+      :root[data-theme='dark'] .rating-dnf { background: #45191c; color: #fca5a5; }
+
+      .status-reading {
+        display: inline-block;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      :root[data-theme='dark'] .status-reading {
+        background: #172a54;
+        color: #93c5fd;
+      }
+
       img {
         max-width: 100%;
         height: auto;
+        border-radius: 8px;
+      }
+
+      code {
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.86em;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
         border-radius: 4px;
+        padding: 0.1em 0.35em;
+      }
+
+      pre {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        line-height: 1.6;
+      }
+
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 0.85rem;
+      }
+
+      /* ---------- footer ---------- */
+
+      footer {
+        margin-top: 5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .footer-name {
+        font-family: 'Fraunces', Georgia, serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text);
+      }
+
+      .footer-tagline {
+        color: var(--faint);
+        font-size: 0.82rem;
+        margin-top: 0.2rem;
+      }
+
+      .socials {
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+      }
+
+      .socials a {
+        color: var(--faint);
+        display: flex;
+        padding: 0.45rem;
+        border-radius: 6px;
+        transition: color 0.15s ease, background 0.15s ease;
+      }
+
+      .socials a:hover {
+        color: var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .footer-legal {
+        margin-top: 1.5rem;
+        color: var(--faint);
+        font-size: 0.8rem;
+      }
+
+      .footer-legal a {
+        color: var(--faint);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .footer-legal a:hover {
+        color: var(--accent);
+      }
+
+      @media (max-width: 540px) {
+        body {
+          padding: 1rem 1rem 2rem;
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        header nav {
+          flex-wrap: wrap;
+          gap: 0.9rem;
+          padding-bottom: 1rem;
+          margin-bottom: 2rem;
+        }
+
+        .nav-links {
+          gap: 1rem;
+        }
+
+        .nav-links a {
+          font-size: 0.88rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *, *::before, *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
       }
     </style>
   </body>

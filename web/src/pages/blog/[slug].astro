@@ -1,5 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro'
+import Subscribe from '../../components/Subscribe.astro'
+import Comments from '../../components/Comments.astro'
 import {sanityClient} from 'sanity:client'
 import {marked} from 'marked'
 import markedKatex from 'marked-katex-extension'
@@ -109,7 +111,8 @@ const jsonLd = JSON.stringify({
   <script type="application/ld+json" set:html={jsonLd} />
   <script type="application/ld+json" set:html={breadcrumbLd} />
   <article>
-    <header>
+    <header class="post-header">
+      <a href="/blog" class="crumb">&larr; Blog</a>
       <h1>{post.title}</h1>
       <div class="meta">
         {
@@ -117,7 +120,7 @@ const jsonLd = JSON.stringify({
             <span class="author">
               {post.author.image && (
                 <img
-                  src={urlFor(post.author.image).width(32).height(32).url()}
+                  src={urlFor(post.author.image).width(56).height(56).url()}
                   alt={post.author.name}
                   class="author-img"
                 />
@@ -153,7 +156,7 @@ const jsonLd = JSON.stringify({
     {
       post.mainImage && (
         <img
-          src={urlFor(post.mainImage).width(720).url()}
+          src={urlFor(post.mainImage).width(1440).url()}
           alt={post.title}
           class="hero-image"
         />
@@ -166,158 +169,162 @@ const jsonLd = JSON.stringify({
     </div>
   </article>
 
-  <a href="/blog" class="back">&larr; Back to blog</a>
-
-  <section class="subscribe">
-    <p>Enjoyed this post? Get new ones in your inbox.</p>
-    <form class="subscribe-form" action="https://app.kit.com/forms/9065996/subscriptions" method="post" data-sv-form="9065996" data-uid="a1f891a000" data-format="inline" target="_blank">
-      <input type="email" name="email_address" placeholder="your@email.com" required />
-      <button type="submit">Subscribe</button>
-    </form>
-    <p class="consent-note">By subscribing, you agree to our <a href="/privacy">privacy policy</a>. Unsubscribe anytime.</p>
-    <p class="rss-link">Or subscribe via <a href="/rss.xml">RSS</a></p>
-  </section>
+  <Subscribe heading="Enjoyed this post?" blurb="Get new ones delivered straight to your inbox. No spam, ever." />
 
   {relatedPosts.length > 0 && (
     <section class="related">
-      <h2>Related Posts</h2>
+      <p class="section-label">Related posts</p>
       <ul>
         {relatedPosts.map((rp: any) => (
           <li>
-            <a href={`/blog/${rp.slug.current}/`}>{rp.title}</a>
-            {rp.publishedAt && (
-              <time datetime={rp.publishedAt}>
-                {new Date(rp.publishedAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </time>
-            )}
+            <a href={`/blog/${rp.slug.current}/`} class="related-row plain">
+              <span class="related-title">{rp.title}</span>
+              {rp.publishedAt && (
+                <time datetime={rp.publishedAt}>
+                  {new Date(rp.publishedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </time>
+              )}
+            </a>
           </li>
         ))}
       </ul>
     </section>
   )}
 
-  <section class="comments">
-    <script
-      src="https://giscus.app/client.js"
-      data-repo="mavaali/waglesworld"
-      data-repo-id="R_kgDORLJ8TQ"
-      data-category="General"
-      data-category-id="DIC_kwDORLJ8Tc4C2CHX"
-      data-mapping="pathname"
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="top"
-      data-theme="light"
-      data-lang="en"
-      data-loading="lazy"
-      crossorigin="anonymous"
-      async
-    ></script>
-  </section>
+  <Comments />
 </Base>
 
 <style>
-  article header {
+  .post-header {
     margin-bottom: 2rem;
+  }
+
+  .crumb {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+  }
+
+  .crumb:hover {
+    color: var(--accent);
+  }
+
+  .post-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.85rem;
   }
 
   .meta {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    color: #666;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    color: var(--muted);
+    font-size: 0.88rem;
   }
 
   .author {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-weight: 500;
+    color: var(--text);
   }
 
   .author-img {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
   }
 
   .tags {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-  }
-
-  .tag {
-    background: #f0f0f0;
-    padding: 0.15rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.8rem;
-    color: #555;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+    flex-wrap: wrap;
   }
 
   .hero-image {
     width: 100%;
     margin-bottom: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
   }
 
   .body {
-    font-size: 1.05rem;
+    font-size: 1.06rem;
     line-height: 1.8;
   }
 
   .body :global(p) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.35rem;
   }
 
   .body :global(h2) {
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0.85rem;
+    font-size: 1.55rem;
   }
 
   .body :global(h3) {
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.6rem;
+    font-size: 1.2rem;
   }
 
   .body :global(blockquote) {
-    border-left: 3px solid #ddd;
-    padding-left: 1rem;
-    color: #555;
+    border-left: 3px solid var(--accent);
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    color: var(--muted);
     margin: 1.5rem 0;
+    font-style: italic;
+  }
+
+  .body :global(blockquote p:last-child) {
+    margin-bottom: 0;
   }
 
   .body :global(ul),
   .body :global(ol) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.35rem;
     padding-left: 1.5rem;
   }
 
-  .body :global(img) {
-    margin: 1.5rem 0;
+  .body :global(li) {
+    margin-bottom: 0.4rem;
   }
 
-  .body :global(a) {
-    color: #0066cc;
-    text-decoration: underline;
+  .body :global(img) {
+    margin: 1.75rem 0;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+
+  .body :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem auto;
+    width: 40%;
   }
 
   .body :global(table) {
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     overflow-x: auto;
     display: block;
   }
 
   .body :global(thead) {
-    border-bottom: 2px solid #1a1a1a;
+    border-bottom: 2px solid var(--text);
   }
 
   .body :global(th) {
@@ -329,120 +336,64 @@ const jsonLd = JSON.stringify({
 
   .body :global(td) {
     padding: 0.6rem 1rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
   }
 
   .body :global(tbody tr:hover) {
-    background: #fafafa;
+    background: var(--surface-2);
   }
 
-  .back {
-    display: inline-block;
+  .body :global(.footnotes) {
     margin-top: 3rem;
-    color: #666;
-    font-size: 0.875rem;
-  }
-
-  .subscribe {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
-  }
-
-  .subscribe p {
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  .subscribe-form {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .subscribe-form input {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: inherit;
-  }
-
-  .subscribe-form button {
-    padding: 0.5rem 1.25rem;
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .subscribe-form button:hover {
-    background: #333;
-  }
-
-  .consent-note {
-    font-size: 0.75rem;
-    color: #999;
-    margin-top: 0.5rem;
-    margin-bottom: 0;
-  }
-
-  .consent-note a {
-    color: #999;
-    text-decoration: underline;
-  }
-
-  .rss-link {
-    font-size: 0.8rem;
-    margin-top: 0.5rem;
-  }
-
-  .rss-link a {
-    color: #0066cc;
-    text-decoration: underline;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--muted);
   }
 
   .related {
-    margin-top: 3rem;
+    margin-top: 3.5rem;
     padding-top: 2rem;
-    border-top: 1px solid #eee;
-  }
-
-  .related h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
+    border-top: 1px solid var(--border);
   }
 
   .related ul {
     list-style: none;
-    padding: 0;
   }
 
-  .related li {
-    margin-bottom: 0.75rem;
+  .related-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 1rem;
+    padding: 0.6rem 0.75rem;
+    margin: 0 -0.75rem;
+    border-radius: 8px;
+    transition: background 0.15s ease;
   }
 
-  .related a {
-    color: #0066cc;
-    text-decoration: underline;
+  .related-row:hover {
+    background: var(--surface-2);
   }
 
-  .related time {
-    color: #999;
-    font-size: 0.8rem;
+  .related-row:hover .related-title {
+    color: var(--accent);
+  }
+
+  .related-title {
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .related-row time {
+    color: var(--faint);
+    font-size: 0.82rem;
     white-space: nowrap;
   }
 
-  .comments {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
+  @media (max-width: 540px) {
+    .post-header h1 {
+      font-size: 1.9rem;
+    }
   }
 </style>

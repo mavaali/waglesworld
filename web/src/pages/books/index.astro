@@ -7,7 +7,13 @@ const reviews = await sanityClient.fetch(bookReviewsQuery)
 ---
 
 <Base title="Books - waglesworld" description="Book reviews and recommendations by Mihir Wagle.">
-  <h1>Books</h1>
+  <header class="page-header">
+    <h1>Books</h1>
+    <p class="page-sub">
+      Short reviews of everything I finish (and the occasional DNF). See what I'm
+      <a href="/reading">reading right now</a>.
+    </p>
+  </header>
   {
     reviews.length === 0 ? (
       <p class="empty">No reviews yet. Check back soon.</p>
@@ -17,20 +23,24 @@ const reviews = await sanityClient.fetch(bookReviewsQuery)
           const cover = bookCoverUrl(review)
           return (
             <li>
-              <a href={`/books/${review.slug.current}`}>
+              <a href={`/books/${review.slug.current}`} class="review-card plain">
                 {cover && <img src={cover} alt={review.title} class="cover" loading="lazy" />}
                 <div class="info">
                   <span class="book-title">{review.title}</span>
                   <span class="book-author">by {review.bookAuthor}</span>
                   <div class="post-meta">
-                    {review.rating && <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>}
-                    {review.publishedAt &&
-                      new Date(review.publishedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    {review.body && ` · ${readingTime(review.body)} min read`}
+                    {review.rating && (
+                      <span class={`rating rating-${review.rating.toLowerCase().replace(/\s+/g, '-')}`}>{review.rating}</span>
+                    )}
+                    <span>
+                      {review.publishedAt &&
+                        new Date(review.publishedAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      {review.body && ` · ${readingTime(review.body)} min read`}
+                    </span>
                   </div>
                   {review.tags && review.tags.length > 0 && (
                     <div class="tags">
@@ -50,8 +60,18 @@ const reviews = await sanityClient.fetch(bookReviewsQuery)
 </Base>
 
 <style>
+  .page-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .page-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-top: 0.25rem;
+  }
+
   .empty {
-    color: #666;
+    color: var(--muted);
     margin-top: 1rem;
   }
 
@@ -59,86 +79,83 @@ const reviews = await sanityClient.fetch(bookReviewsQuery)
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: 1rem;
   }
 
-  .reviews a {
+  .review-card {
     display: flex;
-    gap: 1rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 1.25rem;
     align-items: flex-start;
+    padding: 1.1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .review-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  }
+
+  .review-card:hover .book-title {
+    color: var(--accent);
   }
 
   .cover {
-    width: 60px;
+    width: 64px;
     height: auto;
-    border-radius: 3px;
+    border-radius: 4px;
     flex-shrink: 0;
+    box-shadow: var(--shadow);
   }
 
   .info {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
+    min-width: 0;
   }
 
   .book-title {
-    font-weight: 500;
-    font-size: 1.1rem;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    transition: color 0.15s ease;
   }
 
   .book-author {
-    color: #666;
+    color: var(--muted);
     font-size: 0.9rem;
   }
 
   .post-meta {
-    color: #666;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-
-  .rating {
-    background: #f0f0f0;
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    margin-right: 0.5rem;
-  }
-
-  .rating-obsessed {
-    background: #fef3c7;
-    color: #92400e;
-  }
-
-  .rating-really-liked-it {
-    background: #d1fae5;
-    color: #065f46;
-  }
-
-  .rating-it-was-fine {
-    background: #f0f0f0;
-    color: #555;
-  }
-
-  .rating-dnf {
-    background: #fee2e2;
-    color: #991b1b;
+    color: var(--faint);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .tags {
     display: flex;
-    gap: 0.25rem;
-    margin-top: 0.25rem;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
     flex-wrap: wrap;
   }
 
-  .tag {
-    background: #f0f0f0;
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
+  @media (max-width: 480px) {
+    .review-card {
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .cover {
+      width: 52px;
+    }
   }
 </style>
