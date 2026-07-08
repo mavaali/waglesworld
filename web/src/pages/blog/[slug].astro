@@ -31,7 +31,9 @@ const isMarkdown = typeof post.body === 'string'
 const htmlBody = isMarkdown ? marked(post.body) : null
 const minRead = readingTime(post.body)
 const postDescription = excerpt(post.body)
-const postImage = post.mainImage ? urlFor(post.mainImage).width(1200).url() : undefined
+const postImage = post.mainImage
+  ? urlFor(post.mainImage).width(1200).url()
+  : new URL(`/og/${post.slug.current}.png`, Astro.site).href
 const postUrl = new URL(`/blog/${post.slug.current}/`, Astro.site).href
 
 const relatedPosts = post.tags?.length

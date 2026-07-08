@@ -20,5 +20,9 @@
     "marked": "^17.0.1",
     "marked-footnote": "^1.4.0",
     "marked-katex-extension": "^5.1.6"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.26.0"
   }
 }
