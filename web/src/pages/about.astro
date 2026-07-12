@@ -1,6 +1,41 @@
 ---
 import Base from '../layouts/Base.astro'
 
+const projects = [
+  {
+    name: 'Cricket MCP',
+    url: 'https://github.com/mavaali/cricket-mcp',
+    hook: 'A cricket stats nerd’s dream, wired directly into Claude.',
+    description:
+      'An MCP server that turns 10.9 million ball-by-ball deliveries from Cricsheet into a queryable cricket brain — 21,000+ matches in a local DuckDB, answering questions like “How does Kohli bat against Hazlewood in ODIs?” in milliseconds.',
+    tags: ['TypeScript', 'MCP', 'DuckDB'],
+  },
+  {
+    name: 'Daftari',
+    url: 'https://github.com/mavaali/daftari',
+    hook: 'Daftari (دفتری) is the Urdu word for a ledger-keeper.',
+    description:
+      'A long-term memory cortex for LLM agents: a plain-markdown vault they read, write, and curate over time — portable across any model, on your disk, under git. Rent the brain, own the memory.',
+    tags: ['TypeScript', 'MCP', 'npm'],
+  },
+  {
+    name: 'Boundary',
+    url: 'https://github.com/mavaali/boundary',
+    hook: 'Agents do not need more trust. They need a boundary.',
+    description:
+      'Runs tool-calling agents inside an explicit envelope — what they may read, write, and spend — with every run reviewable by a Third Umpire. For when an agent is useful enough to delegate to, but not safe enough to leave unsupervised.',
+    tags: ['Python', 'Agent safety', 'PyPI'],
+  },
+  {
+    name: 'The Agentic Trust Protocol',
+    url: 'https://github.com/mavaali/agentic-trust-protocol',
+    hook: 'A series of two-way doors composes into a one-way door.',
+    description:
+      'A research prototype for path-level agent safety: a trust budget, staging area, and irreversibility classifier that catch harm composed across many individually-reasonable actions — the failures no single forward pass can see.',
+    tags: ['Python', 'Research'],
+  },
+]
+
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -46,6 +81,28 @@ const jsonLd = JSON.stringify({
         <span class="fact-label">Writing about</span>
         <span class="fact-value">Agentic AI &middot; Data platforms &middot; Cricket</span>
       </div>
+    </div>
+
+    <h2>Things I build on weekends</h2>
+    <p class="projects-intro">
+      Mostly at the intersection of agentic AI and cricket — the two things this blog can't stop talking about.
+    </p>
+    <div class="projects">
+      {projects.map((project) => (
+        <a href={project.url} class="project-card plain" target="_blank" rel="noopener noreferrer">
+          <div class="project-head">
+            <span class="project-name">{project.name}</span>
+            <span class="project-arrow" aria-hidden="true">&#8599;</span>
+          </div>
+          <p class="project-hook">{project.hook}</p>
+          <p class="project-desc">{project.description}</p>
+          <div class="project-tags">
+            {project.tags.map((tag) => (
+              <span class="project-tag">{tag}</span>
+            ))}
+          </div>
+        </a>
+      ))}
     </div>
 
     <h2>Find me elsewhere</h2>
@@ -104,6 +161,90 @@ const jsonLd = JSON.stringify({
   .fact-value {
     font-size: 0.92rem;
     font-weight: 500;
+  }
+
+  .projects-intro {
+    color: var(--muted);
+    margin-top: -0.35rem;
+  }
+
+  .projects {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .project-card {
+    display: block;
+    padding: 1.1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .project-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .project-name {
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.15s ease;
+  }
+
+  .project-card:hover .project-name {
+    color: var(--accent);
+  }
+
+  .project-arrow {
+    color: var(--faint);
+    font-size: 0.9rem;
+    transition: color 0.15s ease;
+  }
+
+  .project-card:hover .project-arrow {
+    color: var(--accent);
+  }
+
+  .bio p.project-hook {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0.25rem 0 0.5rem;
+  }
+
+  .bio p.project-desc {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  .project-tags {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .project-tag {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
   }
 
   .elsewhere {
