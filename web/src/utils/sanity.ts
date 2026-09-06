@@ -47,7 +47,7 @@ export function readingTime(body: unknown): number {
   return Math.max(1, Math.ceil(words / 225))
 }
 
-export const postsQuery = groq`*[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
+export const postsQuery = groq`*[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
   _id,
   title,
   slug,

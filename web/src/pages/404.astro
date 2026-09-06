@@ -5,73 +5,91 @@ import Base from '../layouts/Base.astro'
 <Base title="Page not found - waglesworld" description="This page doesn't exist.">
   <section class="notfound">
     <p class="code">404</p>
-    <h1>That's a wide one.</h1>
-    <p class="blurb">The page you're looking for sailed past the boundary. Let's get you back on strike.</p>
+    <h1 id="nf-title">That's a wide one.</h1>
+    <p class="blurb" id="nf-blurb">The page you're looking for sailed past the boundary. Let's get you back on strike.</p>
+    <p class="blurb" id="nf-series" hidden>
+      If you're after a part of <em>Too Many Dreams, One Body</em> &mdash; that's a six-part series,
+      and a new part drops each day. This one may not be out yet. Start from the top and come back
+      tomorrow for the next one.
+    </p>
     <div class="links">
       <a href="/" class="btn-primary plain">Back home</a>
       <a href="/blog" class="btn-ghost plain">Browse the blog &rarr;</a>
     </div>
+    <div class="links" id="nf-series-link" hidden>
+      <a href="/blog/too-many-dreams-one-body" class="btn-ghost plain">Series index &rarr;</a>
+    </div>
   </section>
+
+  <script is:inline>
+    if (location.pathname.includes('too-many-dreams')) {
+      const el = (id) => document.getElementById(id)
+      if (el('nf-title')) el('nf-title').textContent = 'Not out yet.'
+      if (el('nf-blurb')) el('nf-blurb').hidden = true
+      if (el('nf-series')) el('nf-series').hidden = false
+      if (el('nf-series-link')) el('nf-series-link').hidden = false
+    }
+  </script>
+
+  <style>
+    .notfound {
+      text-align: center;
+      padding: 4rem 0 5rem;
+    }
+
+    .code {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 5rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .blurb {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 26rem;
+      margin: 0 auto;
+    }
+
+    .links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 0.6rem 1.4rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.15s ease;
+    }
+
+    :global(:root[data-theme='dark']) .btn-primary {
+      color: #1c1917;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-ghost {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--accent);
+    }
+  </style>
 </Base>
-
-<style>
-  .notfound {
-    text-align: center;
-    padding: 4rem 0 5rem;
-  }
-
-  .code {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 5rem;
-    font-weight: 700;
-    line-height: 1;
-    color: var(--accent);
-    margin-bottom: 0.5rem;
-  }
-
-  .blurb {
-    color: var(--muted);
-    font-size: 1.05rem;
-    max-width: 26rem;
-    margin: 0 auto;
-  }
-
-  .links {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    display: inline-block;
-    padding: 0.6rem 1.4rem;
-    background: var(--accent);
-    color: #fff;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: background 0.15s ease;
-  }
-
-  :global(:root[data-theme='dark']) .btn-primary {
-    color: #1c1917;
-  }
-
-  .btn-primary:hover {
-    background: var(--accent-hover);
-  }
-
-  .btn-ghost {
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: var(--muted);
-    transition: color 0.15s ease;
-  }
-
-  .btn-ghost:hover {
-    color: var(--accent);
-  }
-</style>
