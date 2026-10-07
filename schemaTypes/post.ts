@@ -53,6 +53,9 @@ export default defineType({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
+      // The site only builds posts with publishedAt <= now(); an empty date hides the post.
+      initialValue: () => new Date().toISOString(),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'estimatedReadingTime',
